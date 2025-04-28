@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CV de {{ data.personal_info['name'] }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1, h2, h3 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>{{ data.personal_info['name'] }}</h1>
+    <p><strong>Email :</strong> {{ data.personal_info['email'] }}</p>
+    <p><strong>Téléphone :</strong> {{ data.personal_info['phone'] }}</p>
+    <p><strong>LinkedIn :</strong> {{ data.personal_info['linkedin'] }}</p>
+
+    <h2>Éducation</h2>
+    <p>{{ data.education['degree'] }} - {{ data.education['school'] }} ({{ data.education['year'] }})</p>
+</body>
+</html>

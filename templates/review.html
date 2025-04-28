@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<ul>
+    <li> <h2>{{ data.personal_info['name'] }}</h2></li>
+    <li>Email : {{ data.personal_info['email'] }}</li>
+    <li>Téléphone : {{ data.personal_info['phone'] }}</li>
+    <li>LinkedIn : {{ data.personal_info['linkedin'] }}</li>
+</ul>
+
+<h3>Éducation</h3>
+{% for edu in data.education %}
+<ul>
+    <li><strong>{{ edu.degree }}</strong> - {{ edu.school }} ({{ edu.start_year }}{% if edu.in_progress %} - en cours{% else %} - {{ edu.end_year }}{% endif %})</li>
+    <ul>
+        {% for course in edu.courses %}
+            {% if course %}
+            <li>Cours phare : {{ course }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</ul>
+{% endfor %}
+
+
+<br><br>
+<a href="/generate_cv"><button>Télécharger mon CV en PDF 📄</button></a>
+{% endblock %}

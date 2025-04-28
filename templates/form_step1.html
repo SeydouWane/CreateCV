@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Étape 1 : Informations Personnelles</h2>
+<form method="POST">
+    <label>Nom :</label><br>
+    <input type="text" name="name" value="{{ personal_info.get('name', '') }}" required><br><br>
+
+    <label>Email :</label><br>
+    <input type="email" name="email" value="{{ personal_info.get('email', '') }}" required><br><br>
+
+    <label>Téléphone :</label><br>
+    <input type="text" name="phone" value="{{ personal_info.get('phone', '') }}" required><br><br>
+
+    <label>LinkedIn :</label><br>
+    <input type="text" name="linkedin" value="{{ personal_info.get('linkedin', '') }}"><br><br>
+
+    <button type="submit">Suivant ➡️</button>
+</form>
+{% endblock %}

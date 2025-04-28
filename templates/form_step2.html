@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Étape 2 : Formations</h2>
+
+<form method="POST" id="educationForm">
+    <div id="educationFields">
+        <div class="educationEntry">
+            <label>Diplôme :</label><br>
+            <input type="text" name="degree[]" required><br><br>
+
+            <label>Établissement :</label><br>
+            <input type="text" name="school[]" required><br><br>
+
+            <label>Année de début :</label><br>
+            <input type="text" name="start_year[]" required><br><br>
+
+            <label>Année d'obtention :</label><br>
+            <input type="text" name="end_year[]"><br><br>
+
+            <label>Formation en cours :</label>
+            <input type="checkbox" name="in_progress[]"><br><br>
+
+            <label>Cours phares :</label><br>
+            <input type="text" name="course1[]" placeholder="Cours phare 1"><br><br>
+            <input type="text" name="course2[]" placeholder="Cours phare 2"><br><br>
+            <input type="text" name="course3[]" placeholder="Cours phare 3"><br><br>
+            <input type="text" name="course4[]" placeholder="Cours phare 4"><br><br>
+
+            <hr>
+        </div>
+    </div>
+
+    <button type="button" onclick="addEducation()">➕ Ajouter une formation</button>
+    <br><br>
+    <button type="submit">Suivant ➡️</button>
+</form>
+
+<script>
+function addEducation() {
+    var div = document.createElement('div');
+    div.className = 'educationEntry';
+    div.innerHTML = `
+        <label>Diplôme :</label><br>
+        <input type="text" name="degree[]" required><br><br>
+
+        <label>Établissement :</label><br>
+        <input type="text" name="school[]" required><br><br>
+
+        <label>Année de début :</label><br>
+        <input type="text" name="start_year[]" required><br><br>
+
+        <label>Année d'obtention :</label><br>
+        <input type="text" name="end_year[]"><br><br>
+
+        <label>Formation en cours :</label>
+        <input type="checkbox" name="in_progress[]"><br><br>
+
+        <label>Cours phares :</label><br>
+        <input type="text" name="course1[]" placeholder="Cours phare 1"><br><br>
+        <input type="text" name="course2[]" placeholder="Cours phare 2"><br><br>
+        <input type="text" name="course3[]" placeholder="Cours phare 3"><br><br>
+        <input type="text" name="course4[]" placeholder="Cours phare 4"><br><br>
+
+        <hr>
+    `;
+    document.getElementById('educationFields').appendChild(div);
+}
+</script>
+{% endblock %}
