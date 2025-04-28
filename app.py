@@ -44,7 +44,7 @@ def step2():
                 ]
             })
         session['education'] = education_list
-        return redirect('/review')
+        return redirect('/step3')   # ← ← ← ici tu corriges !
     return render_template('form_step2.html')
 
 
@@ -60,6 +60,16 @@ def generate_cv():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'attachment; filename=cv.pdf'
     return response
+
+
+@app.route('/step3', methods=['GET', 'POST'])
+def step3():
+    if request.method == 'POST':
+        skills = request.form.getlist('skills[]')
+        session['skills'] = skills
+        return redirect('/review')
+    return render_template('form_step3.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

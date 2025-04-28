@@ -1,1 +1,32 @@
-   
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Étape 3 : Compétences</h2>
+
+<form method="POST" id="skillsForm">
+    <div id="skillsFields">
+        <div class="skillEntry">
+            <label>Compétence :</label><br>
+            <input type="text" name="skills[]" required><br><br>
+            <hr>
+        </div>
+    </div>
+
+    <button type="button" onclick="addSkill()">➕ Ajouter une compétence</button>
+    <br><br>
+    <button type="submit">Suivant ➡️</button>
+</form>
+
+<script>
+function addSkill() {
+    var div = document.createElement('div');
+    div.className = 'skillEntry';
+    div.innerHTML = `
+        <label>Compétence :</label><br>
+        <input type="text" name="skills[]" required><br><br>
+        <hr>
+    `;
+    document.getElementById('skillsFields').appendChild(div);
+}
+</script>
+{% endblock %}
