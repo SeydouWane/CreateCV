@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Étape 1A : Langues</h2>
+
+<form method="POST" id="languagesForm">
+    <div id="languagesFields">
+        <div class="languageEntry">
+            <label>Langue :</label><br>
+            <input type="text" name="language_name[]" required><br><br>
+
+            <label>Compétences :</label><br>
+            <input type="checkbox" name="speak_0"> Parlé
+            <input type="checkbox" name="read_0"> Lu
+            <input type="checkbox" name="write_0"> Écrit
+            <br><br>
+
+            <hr>
+        </div>
+    </div>
+
+    <button type="button" onclick="addLanguage()">➕ Ajouter une langue</button>
+    <br><br>
+    <button type="submit">Suivant ➡️</button>
+</form>
+
+<script>
+let languageCount = 1;
+
+function addLanguage() {
+    var div = document.createElement('div');
+    div.className = 'languageEntry';
+    div.innerHTML = `
+        <label>Langue :</label><br>
+        <input type="text" name="language_name[]" required><br><br>
+
+        <label>Compétences :</label><br>
+        <input type="checkbox" name="speak_${languageCount}"> Parlé
+        <input type="checkbox" name="read_${languageCount}"> Lu
+        <input type="checkbox" name="write_${languageCount}"> Écrit
+        <br><br>
+
+        <hr>
+    `;
+    document.getElementById('languagesFields').appendChild(div);
+    languageCount++;
+}
+</script>
+{% endblock %}

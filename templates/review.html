@@ -1,36 +1,75 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<ul>
-    <li> <h2>{{ data.personal_info['name'] }}</h2></li>
-    <li>Email : {{ data.personal_info['email'] }}</li>
-    <li>Téléphone : {{ data.personal_info['phone'] }}</li>
-    <li>LinkedIn : {{ data.personal_info['linkedin'] }}</li>
-</ul>
 
-<h3>Éducation</h3>
-{% for edu in data.education %}
+<div style="display: flex; align-items: flex-start;">
+    {% if data.personal_info['photo_filename'] %}
+        <div style="margin-right: 20px;">
+            <img src="{{ url_for('static', filename='uploads/' + data.personal_info['photo_filename']) }}" alt="Photo professionnelle" width="100">
+        </div>
+    {% endif %}
+
+    <div>
+        <h2>{{ data.personal_info['name'] }}</h2>
+        <ul style="list-style-type: none; padding-left: 0;">
+            <li><strong>Email :</strong> {{ data.personal_info['email'] }}</li>
+            <li><strong>Téléphone :</strong> {{ data.personal_info['phone'] }}</li>
+            <li><strong>LinkedIn :</strong> {{ data.personal_info['linkedin'] }}</li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+{% if data.languages %}
+<h3>Langues</h3>
 <ul>
-    <li><strong>{{ edu.degree }}</strong> - {{ edu.school }} ({{ edu.start_year }}{% if edu.in_progress %} - en cours{% else %} - {{ edu.end_year }}{% endif %})</li>
-    <ul>
-        {% for course in edu.courses %}
-            {% if course %}
-            <li>Cours phare : {{ course }}</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</ul>
+{% for lang in data.languages %}
+    <li>
+        <strong>{{ lang.name }}</strong> :
+        {% if lang.speak %} Parlé {% endif %}
+        {% if lang.read %} Lu {% endif %}
+        {% if lang.write %} Écrit {% endif %}
+    </li>
 {% endfor %}
+</ul>
+<hr>
+{% endif %}
 
-
+{% if data.skills %}
 <h3>Compétences</h3>
 <ul>
 {% for skill in data.skills %}
     <li>{{ skill }}</li>
 {% endfor %}
 </ul>
+<hr>
+{% endif %}
 
+{% if data.education %}
+<h3>Éducation</h3>
+{% for edu in data.education %}
+<ul style="margin-bottom: 20px;">
+    <li>
+        <strong>{{ edu.degree }}</strong> - {{ edu.school }}
+        ({{ edu.start_year }}{% if edu.in_progress %} - en cours{% else %} - {{ edu.end_year }}{% endif %})
+        <ul>
+            {% for course in edu.courses %}
+                {% if course %}
+                <li>{{ course }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </li>
+</ul>
+{% endfor %}
+<hr>
+{% endif %}
 
-<br><br>
-<a href="/generate_cv"><button>Télécharger mon CV en PDF 📄</button></a>
+<div style="text-align: center; margin-top: 30px;">
+    <a href="/generate_cv">
+        <button style="padding: 10px 20px; font-size: 16px;">📄 Télécharger mon CV en PDF</button>
+    </a>
+</div>
+
 {% endblock %}

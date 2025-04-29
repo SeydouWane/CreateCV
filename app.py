@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, make_response
 import pdfkit
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'
@@ -8,12 +10,55 @@ app.secret_key = 'super_secret_key'
 def index():
     return redirect('/step1')
 
+
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route('/step1', methods=['GET', 'POST'])
 def step1():
     if request.method == 'POST':
-        session['personal_info'] = request.form.to_dict()
-        return redirect('/step2')
+        personal_info = request.form.to_dict()
+
+        # Gestion de la photo
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                personal_info['photo_filename'] = filename
+            else:
+                personal_info['photo_filename'] = None
+        else:
+            personal_info['photo_filename'] = None
+
+        session['personal_info'] = personal_info
+        return redirect('/step1a')
     return render_template('form_step1.html', personal_info=session.get('personal_info', {}))
+
+@app.route('/step1a', methods=['GET', 'POST'])
+def step1a():
+    if request.method == 'POST':
+        languages = []
+        language_names = request.form.getlist('language_name[]')
+
+        for i, name in enumerate(language_names):
+            language_info = {
+                'name': name,
+                'speak': True if f'speak_{i}' in request.form else False,
+                'read': True if f'read_{i}' in request.form else False,
+                'write': True if f'write_{i}' in request.form else False,
+            }
+            languages.append(language_info)
+
+        session['languages'] = languages
+        return redirect('/step2')  
+
+    return render_template('form_step1a.html')
 
 @app.route('/step2', methods=['GET', 'POST'])
 def step2():
