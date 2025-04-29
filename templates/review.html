@@ -2,7 +2,8 @@
 
 {% block content %}
 
-<div style="display: flex; align-items: flex-start;">
+<!-- En-tête : Photo + infos perso -->
+<div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
     {% if data.personal_info['photo_filename'] %}
         <div style="margin-right: 20px;">
             <img src="{{ url_for('static', filename='uploads/' + data.personal_info['photo_filename']) }}" alt="Photo professionnelle" width="100">
@@ -10,7 +11,7 @@
     {% endif %}
 
     <div>
-        <h2>{{ data.personal_info['name'] }}</h2>
+        <h2 style="margin-top: 0;">{{ data.personal_info['name'] }}</h2>
         <ul style="list-style-type: none; padding-left: 0;">
             <li><strong>Email :</strong> {{ data.personal_info['email'] }}</li>
             <li><strong>Téléphone :</strong> {{ data.personal_info['phone'] }}</li>
@@ -21,54 +22,80 @@
 
 <hr>
 
+<!-- Langues -->
 {% if data.languages %}
 <h3>Langues</h3>
 <ul>
-{% for lang in data.languages %}
+    {% for lang in data.languages %}
     <li>
         <strong>{{ lang.name }}</strong> :
         {% if lang.speak %} Parlé {% endif %}
         {% if lang.read %} Lu {% endif %}
         {% if lang.write %} Écrit {% endif %}
     </li>
-{% endfor %}
+    {% endfor %}
 </ul>
 <hr>
 {% endif %}
 
+<!-- Compétences -->
 {% if data.skills %}
 <h3>Compétences</h3>
 <ul>
-{% for skill in data.skills %}
+    {% for skill in data.skills %}
     <li>{{ skill }}</li>
-{% endfor %}
+    {% endfor %}
 </ul>
 <hr>
 {% endif %}
 
+<!-- Éducation -->
 {% if data.education %}
 <h3>Éducation</h3>
-{% for edu in data.education %}
-<ul style="margin-bottom: 20px;">
-    <li>
-        <strong>{{ edu.degree }}</strong> - {{ edu.school }}
-        ({{ edu.start_year }}{% if edu.in_progress %} - en cours{% else %} - {{ edu.end_year }}{% endif %})
+<ul>
+    {% for edu in data.education %}
+    <li style="margin-bottom: 15px;">
+        <strong>{{ edu.degree }}</strong> – {{ edu.school }} ({{ edu.start_year }}{% if edu.in_progress %} – en cours{% else %} – {{ edu.end_year }}{% endif %})
+        {% if edu.courses %}
         <ul>
             {% for course in edu.courses %}
-                {% if course %}
-                <li>{{ course }}</li>
-                {% endif %}
+                {% if course %}<li>{{ course }}</li>{% endif %}
             {% endfor %}
         </ul>
+        {% endif %}
     </li>
+    {% endfor %}
 </ul>
-{% endfor %}
 <hr>
 {% endif %}
 
+<!-- Expériences professionnelles -->
+{% if data.experiences %}
+<h3>Expériences professionnelles</h3>
+<ul>
+    {% for exp in data.experiences %}
+    <li style="margin-bottom: 15px;">
+        <strong>{{ exp.title }}</strong> – {{ exp.company }} ({{ exp.location }})<br>
+        <span>{{ exp.type }} – {{ exp.start_date }} {% if exp.current %}– Aujourd'hui{% else %}– {{ exp.end_date }}{% endif %}</span>
+        {% if exp.description %}
+        <div><em>{{ exp.description }}</em></div>
+        {% endif %}
+        {% if exp.ref_name and exp.ref_contact %}
+        <div><strong>Référence :</strong> {{ exp.ref_name }} — {{ exp.ref_contact }}</div>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<hr>
+{% endif %}
+
+<!-- Téléchargement PDF -->
 <div style="text-align: center; margin-top: 30px;">
     <a href="/generate_cv">
-        <button style="padding: 10px 20px; font-size: 16px;">📄 Télécharger mon CV en PDF</button>
+        <button style="padding: 10px 20px; font-size: 16px;">📄 Télécharger le CV en français</button>
+    </a>
+    <a href="/generate_cv_en">
+        <button style="padding: 10px 20px; font-size: 16px; margin-left: 10px;">📄 Download CV in English</button>
     </a>
 </div>
 

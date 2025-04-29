@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Étape 4 : Expériences professionnelles</h2>
+
+<form method="POST" id="experienceForm">
+    <div id="experienceFields">
+        <div class="experienceEntry">
+            <label>Poste :</label><br>
+            <input type="text" name="title[]"><br><br>
+
+            <label>Entreprise :</label><br>
+            <input type="text" name="company[]"><br><br>
+
+            <label>Ville / Pays :</label><br>
+            <input type="text" name="location[]"><br><br>
+
+            <label>Type de contrat :</label><br>
+            <select name="type[]">
+                <option value="">-- Sélectionner --</option>
+                <option>CDI</option>
+                <option>CDD</option>
+                <option>Stage</option>
+                <option>Freelance</option>
+                <option>Prestation</option>
+                <option>Autre</option>
+            </select><br><br>
+
+            <label>Date de début :</label><br>
+            <input type="text" name="start_date[]" placeholder="MM/YYYY"><br><br>
+
+            <label>Date de fin :</label><br>
+            <input type="text" name="end_date[]" placeholder="MM/YYYY"><br><br>
+
+            <label>Actuellement en poste :</label>
+            <input type="checkbox" name="current[]"><br><br>
+
+            <label>Description des missions :</label><br>
+            <textarea name="description[]" rows="3" cols="50" placeholder="Décrivez vos responsabilités..."></textarea><br><br>
+
+            <label>Personne de référence :</label><br>
+            <input type="text" name="ref_name[]" placeholder="Nom de la personne"><br><br>
+
+            <label>Contact de la référence :</label><br>
+            <input type="text" name="ref_contact[]" placeholder="Email ou téléphone"><br><br>
+
+            <hr>
+        </div>
+    </div>
+
+    <button type="button" onclick="addExperience()">➕ Ajouter une expérience</button>
+    <br><br>
+    <button type="submit">Suivant ➡️</button>
+</form>
+
+<script>
+let expCount = 1;
+
+function addExperience() {
+    const div = document.createElement('div');
+    div.className = 'experienceEntry';
+    div.innerHTML = `
+        <label>Poste :</label><br>
+        <input type="text" name="title[]"><br><br>
+
+        <label>Entreprise :</label><br>
+        <input type="text" name="company[]"><br><br>
+
+        <label>Ville / Pays :</label><br>
+        <input type="text" name="location[]"><br><br>
+
+        <label>Type de contrat :</label><br>
+        <select name="type[]">
+            <option value="">-- Sélectionner --</option>
+            <option>CDI</option>
+            <option>CDD</option>
+            <option>Stage</option>
+            <option>Freelance</option>
+            <option>Prestation</option>
+            <option>Autre</option>
+        </select><br><br>
+
+        <label>Date de début :</label><br>
+        <input type="text" name="start_date[]" placeholder="MM/YYYY"><br><br>
+
+        <label>Date de fin :</label><br>
+        <input type="text" name="end_date[]" placeholder="MM/YYYY"><br><br>
+
+        <label>Actuellement en poste :</label>
+        <input type="checkbox" name="current[]"><br><br>
+
+        <label>Description des missions :</label><br>
+        <textarea name="description[]" rows="3" cols="50" placeholder="Décrivez vos responsabilités..."></textarea><br><br>
+
+        <label>Personne de référence :</label><br>
+        <input type="text" name="ref_name[]" placeholder="Nom de la personne"><br><br>
+
+        <label>Contact de la référence :</label><br>
+        <input type="text" name="ref_contact[]" placeholder="Email ou téléphone"><br><br>
+
+        <hr>
+    `;
+    document.getElementById('experienceFields').appendChild(div);
+    expCount++;
+}
+</script>
+{% endblock %}

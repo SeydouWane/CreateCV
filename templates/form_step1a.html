@@ -7,14 +7,26 @@
     <div id="languagesFields">
         <div class="languageEntry">
             <label>Langue :</label><br>
-            <input type="text" name="language_name[]" required><br><br>
+            <select name="language_name[]" required>
+                <option value="">-- Choisissez une langue --</option>
+                <option>Français</option>
+                <option>Anglais</option>
+                <option>Espagnol</option>
+                <option>Arabe</option>
+                <option>Wolof</option>
+                <option>Peul</option>
+                <option>Allemand</option>
+                <option>Italien</option>
+                <option>Chinois</option>
+                <option>Portugais</option>
+                <option>Autre</option>
+            </select><br><br>
 
             <label>Compétences :</label><br>
             <input type="checkbox" name="speak_0"> Parlé
             <input type="checkbox" name="read_0"> Lu
             <input type="checkbox" name="write_0"> Écrit
             <br><br>
-
             <hr>
         </div>
     </div>
@@ -32,14 +44,26 @@ function addLanguage() {
     div.className = 'languageEntry';
     div.innerHTML = `
         <label>Langue :</label><br>
-        <input type="text" name="language_name[]" required><br><br>
+        <select name="language_name[]" required>
+            <option value="">-- Choisissez une langue --</option>
+            <option>Français</option>
+            <option>Anglais</option>
+            <option>Espagnol</option>
+            <option>Arabe</option>
+            <option>Wolof</option>
+            <option>Peul</option>
+            <option>Allemand</option>
+            <option>Italien</option>
+            <option>Chinois</option>
+            <option>Portugais</option>
+            <option>Autre</option>
+        </select><br><br>
 
         <label>Compétences :</label><br>
         <input type="checkbox" name="speak_${languageCount}"> Parlé
         <input type="checkbox" name="read_${languageCount}"> Lu
         <input type="checkbox" name="write_${languageCount}"> Écrit
         <br><br>
-
         <hr>
     `;
     document.getElementById('languagesFields').appendChild(div);
