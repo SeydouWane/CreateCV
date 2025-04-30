@@ -3,18 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <title>CV de {{ data.personal_info['name'] }}</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        h1, h2, h3 { color: #333; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>{{ data.personal_info['name'] }}</h1>
-    <p><strong>Email :</strong> {{ data.personal_info['email'] }}</p>
-    <p><strong>Téléphone :</strong> {{ data.personal_info['phone'] }}</p>
-    <p><strong>LinkedIn :</strong> {{ data.personal_info['linkedin'] }}</p>
 
-    <h2>Éducation</h2>
-    <p>{{ data.education['degree'] }} - {{ data.education['school'] }} ({{ data.education['year'] }})</p>
+<div class="container">
+    <div class="flex-review-header">
+        {% if data.personal_info['photo_filename'] %}
+            <div>
+                <img src="{{ url_for('static', filename='uploads/' + data.personal_info['photo_filename']) }}" alt="Photo" class="cv-photo">
+            </div>
+        {% endif %}
+        <div>
+            <h2>{{ data.personal_info['name'] }}</h2>
+            <p><strong>{{ data.personal_info['phone'] }}</strong> | {{ data.personal_info['email'] }}<br>
+            <a href="{{ data.personal_info['linkedin'] }}">{{ data.personal_info['linkedin'] }}</a></p>
+        </div>
+    </div>
+
+    <hr>
+
+    {% if data.skills %}
+    <h3>Compétences</h3>
+    <ul>
+        {% for skill in data.skills %}
+        <li>{{ skill }}</li>
+        {% endfor %}
+    </ul>
+    <hr>
+    {% endif %}
+
+    {% if data.languages %}
+    <h3>Langues</h3>
+    <ul>
+        {% for lang in data.languages %}
+        <li><strong>{{ lang.name }}</strong> :
+            {% if lang.speak %} Parlé {% endif %}
+            {% if lang.read %} Lu {% endif %}
+            {% if lang.write %} Écrit {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    <hr>
+    {% endif %}
+
+    {% if data.education %}
+    <h3>Éducation</h3>
+    <ul>
+        {% for edu in data.education %}
+        <li>
+            <strong>{{ edu.degree }}</strong> – {{ edu.school }} ({{ edu.start_year }}{% if edu.in_progress %} – en cours{% else %} – {{ edu.end_year }}{% endif %})
+            {% if edu.courses %}
+            <ul>
+                {% for course in edu.courses %}
+                    {% if course %}<li>{{ course }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    <hr>
+    {% endif %}
+
+    {% if data.experiences %}
+    <h3>Expériences professionnelles</h3>
+    <ul>
+        {% for exp in data.experiences %}
+        <li>
+            <strong>{{ exp.title }}</strong> – {{ exp.company }} ({{ exp.location }})<br>
+            {{ exp.type }} – {{ exp.start_date }} {% if exp.current %}– Aujourd'hui{% else %}– {{ exp.end_date }}{% endif %}
+            {% if exp.description %}<div><em>{{ exp.description }}</em></div>{% endif %}
+            {% if exp.ref_name and exp.ref_contact %}
+            <div><strong>Référence :</strong> {{ exp.ref_name }} — {{ exp.ref_contact }}</div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    <hr>
+    {% endif %}
+
+    {% if data.distinctions %}
+    <h3>Projets & Distinctions</h3>
+    <ul>
+        {% for item in data.distinctions %}
+        <li>
+            <strong>{{ item.title }}</strong> – {{ item.year }}<br>
+            <em>{{ item.type }}</em>
+            {% if item.description %}<div>{{ item.description }}</div>{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    <hr>
+    {% endif %}
+
+    {% if data.certifications %}
+    <h3>Certifications</h3>
+    <ul>
+        {% for cert in data.certifications %}
+        <li>
+            <strong>{{ cert.name }}</strong> – {{ cert.issuer }}{% if cert.year %}, {{ cert.year }}{% endif %}
+            {% if cert.link %}<br><a href="{{ cert.link }}" target="_blank">{{ cert.link }}</a>{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+
 </body>
 </html>

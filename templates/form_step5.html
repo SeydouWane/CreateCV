@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Étape 5 : Distinctions ou Projets</h2>
+
+<form method="POST" id="projectForm">
+    <div id="projectFields">
+        <div class="projectEntry">
+            <label>Type :</label>
+            <select name="type[]">
+                <option value="Projet">Projet</option>
+                <option value="Distinction">Distinction</option>
+            </select><br><br>
+
+            <label>Titre :</label><br>
+            <input type="text" name="title[]" required><br><br>
+
+            <label>Description :</label><br>
+            <textarea name="description[]" rows="3" cols="50" placeholder="Décris brièvement..."></textarea><br><br>
+
+            <label>Année :</label><br>
+            <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
+
+            <hr>
+        </div>
+    </div>
+
+    <button type="button" onclick="addProject()">➕ Ajouter un projet ou une distinction</button>
+    <br><br>
+    <button type="submit">Suivant ➡️</button>
+</form>
+
+<script>
+function addProject() {
+    const div = document.createElement('div');
+    div.className = 'projectEntry';
+    div.innerHTML = `
+        <label>Type :</label>
+        <select name="type[]">
+            <option value="Projet">Projet</option>
+            <option value="Distinction">Distinction</option>
+        </select><br><br>
+
+        <label>Titre :</label><br>
+        <input type="text" name="title[]" required><br><br>
+
+        <label>Description :</label><br>
+        <textarea name="description[]" rows="3" cols="50" placeholder="Décris brièvement..."></textarea><br><br>
+
+        <label>Année :</label><br>
+        <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
+
+        <hr>
+    `;
+    document.getElementById('projectFields').appendChild(div);
+}
+</script>
+{% endblock %}

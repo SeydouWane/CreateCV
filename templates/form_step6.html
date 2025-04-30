@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Étape 6 : Certificats & Certifications</h2>
+
+<form method="POST" id="certificationForm">
+    <div id="certificationFields">
+        <div class="certificationEntry">
+            <label>Nom du certificat :</label><br>
+            <input type="text" name="name[]" ><br><br>
+
+            <label>Organisme :</label><br>
+            <input type="text" name="issuer[]" ><br><br>
+
+            <label>Année d’obtention :</label><br>
+            <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
+
+            <label>Lien (optionnel) :</label><br>
+            <input type="url" name="link[]" placeholder="https://..."><br><br>
+
+            <hr>
+        </div>
+    </div>
+
+    <button type="button" onclick="addCertification()">➕ Ajouter une certification</button>
+    <br><br>
+    <button type="submit">Valider</button>
+</form>
+
+<script>
+function addCertification() {
+    const div = document.createElement('div');
+    div.className = 'certificationEntry';
+    div.innerHTML = `
+        <label>Nom du certificat :</label><br>
+        <input type="text" name="name[]" required><br><br>
+
+        <label>Organisme :</label><br>
+        <input type="text" name="issuer[]" required><br><br>
+
+        <label>Année d’obtention :</label><br>
+        <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
+
+        <label>Lien (optionnel) :</label><br>
+        <input type="url" name="link[]" placeholder="https://..."><br><br>
+
+        <hr>
+    `;
+    document.getElementById('certificationFields').appendChild(div);
+}
+</script>
+{% endblock %}
