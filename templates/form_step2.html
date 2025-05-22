@@ -27,6 +27,17 @@
             <input type="text" name="course3[]" placeholder="Cours phare 3"><br><br>
             <input type="text" name="course4[]" placeholder="Cours phare 4"><br><br>
 
+            <label>Avez-vous soutenu un mémoire ?</label>
+            <input type="checkbox" class="has_thesis" onchange="toggleThesis(this)"><br><br>
+
+            <div class="thesis-section" style="display: none;">
+                <label>Sujet du mémoire :</label><br>
+                <input type="text" name="thesis_subject[]" placeholder="Sujet du mémoire"><br><br>
+
+                <label>Nom(s) et email(s) des encadreurs :</label><br>
+                <input type="text" name="thesis_supervisors[]" placeholder="Encadreur(s)"><br><br>
+            </div>
+
             <hr>
         </div>
     </div>
@@ -38,7 +49,7 @@
 
 <script>
 function addEducation() {
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.className = 'educationEntry';
     div.innerHTML = `
         <label>Diplôme :</label><br>
@@ -62,9 +73,27 @@ function addEducation() {
         <input type="text" name="course3[]" placeholder="Cours phare 3"><br><br>
         <input type="text" name="course4[]" placeholder="Cours phare 4"><br><br>
 
+        <label>Avez-vous soutenu un mémoire ?</label>
+        <input type="checkbox" class="has_thesis" onchange="toggleThesis(this)"><br><br>
+
+        <div class="thesis-section" style="display: none;">
+            <label>Sujet du mémoire :</label><br>
+            <input type="text" name="thesis_subject[]" placeholder="Sujet du mémoire"><br><br>
+
+            <label>Nom(s) des encadreurs :</label><br>
+            <input type="text" name="thesis_supervisors[]" placeholder="Encadreur(s)"><br><br>
+        </div>
+
         <hr>
     `;
     document.getElementById('educationFields').appendChild(div);
+}
+
+function toggleThesis(checkbox) {
+    const thesisDiv = checkbox.parentElement.querySelector('.thesis-section');
+    if (thesisDiv) {
+        thesisDiv.style.display = checkbox.checked ? 'block' : 'none';
+    }
 }
 </script>
 {% endblock %}

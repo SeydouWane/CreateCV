@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, session, make_response
 import os
 from werkzeug.utils import secure_filename
+from xhtml2pdf import pisa
+from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'
@@ -64,18 +66,26 @@ def step2():
         courses2 = request.form.getlist('course2[]')
         courses3 = request.form.getlist('course3[]')
         courses4 = request.form.getlist('course4[]')
+        thesis_subjects = request.form.getlist('thesis_subject[]')
+        thesis_supervisors = request.form.getlist('thesis_supervisors[]')
+
         for i in range(len(degrees)):
-            education_list.append({
+            education = {
                 'degree': degrees[i],
                 'school': schools[i],
                 'start_year': start_years[i],
                 'end_year': end_years[i] if end_years[i] else None,
-                'in_progress': True if i < len(in_progress_list) else False,
-                'courses': [courses1[i], courses2[i], courses3[i], courses4[i]]
-            })
+                'in_progress': i < len(in_progress_list),
+                'courses': [courses1[i], courses2[i], courses3[i], courses4[i]],
+                'thesis_subject': thesis_subjects[i] if i < len(thesis_subjects) else '',
+                'thesis_supervisors': thesis_supervisors[i] if i < len(thesis_supervisors) else ''
+            }
+            education_list.append(education)
+
         session['education'] = education_list
         return redirect('/step3')
     return render_template('form_step2.html')
+
 
 @app.route('/step3', methods=['GET', 'POST'])
 def step3():
@@ -164,12 +174,22 @@ def step6():
 def review():
     return render_template('review.html', data=session)
 
-from xhtml2pdf import pisa
-from io import BytesIO
+
 
 @app.route('/generate_cv')
 def generate_cv():
-    rendered = render_template('review.html', data=session)
+    data = session.copy()
+
+    # Si la photo est présente, passer un chemin absolu
+    if 'photo_filename' in data.get('personal_info', {}):
+        filename = data['personal_info']['photo_filename']
+        full_path = os.path.join(app.root_path, 'static', 'uploads', filename)
+        data['personal_info']['photo_path'] = full_path
+    else:
+        data['personal_info']['photo_path'] = None
+
+    rendered = render_template('cv_template.html', data=data)
+
     pdf = BytesIO()
     pisa_status = pisa.CreatePDF(rendered, dest=pdf)
 
@@ -180,6 +200,7 @@ def generate_cv():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline; filename=cv.pdf'
     return response
+
 
 
 if __name__ == '__main__':
