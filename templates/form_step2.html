@@ -1,99 +1,145 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Étape 2 : Formations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-{% block content %}
-<h2>Étape 2 : Formations</h2>
+<div class="flex min-h-screen">
 
-<form method="POST" id="educationForm">
-    <div id="educationFields">
-        <div class="educationEntry">
-            <label>Diplôme :</label><br>
-            <input type="text" name="degree[]" required><br><br>
+  <!-- Sidebar -->
+  <aside class="w-72 bg-white shadow-md p-6 border-r">
+    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-base font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="text-blue-600 font-bold">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
+    </ul>
+  </aside>
 
-            <label>Établissement :</label><br>
-            <input type="text" name="school[]" required><br><br>
+  <!-- Main Content -->
+  <main class="flex-1 p-10">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded shadow">
+      <h1 class="text-2xl font-bold mb-6 text-gray-800">Étape 2 : Formations</h1>
 
-            <label>Année de début :</label><br>
-            <input type="text" name="start_year[]" required><br><br>
+      <form method="POST" id="educationForm">
+        <div id="educationFields" class="space-y-6">
+        {% for edu in education %}
+            <div class="educationEntry border p-4 rounded bg-gray-50">
 
-            <label>Année d'obtention :</label><br>
-            <input type="text" name="end_year[]"><br><br>
+            <label class="font-semibold">Diplôme :</label>
+            <input type="text" name="degree[]" value="{{ edu.degree | default('') }}" class="w-full border p-2 rounded mb-3">
 
-            <label>Formation en cours :</label>
-            <input type="checkbox" name="in_progress[]"><br><br>
+            <label class="font-semibold">Établissement :</label>
+            <input type="text" name="school[]" value="{{ edu.school | default('') }}" class="w-full border p-2 rounded mb-3">
 
-            <label>Cours phares :</label><br>
-            <input type="text" name="course1[]" placeholder="Cours phare 1"><br><br>
-            <input type="text" name="course2[]" placeholder="Cours phare 2"><br><br>
-            <input type="text" name="course3[]" placeholder="Cours phare 3"><br><br>
-            <input type="text" name="course4[]" placeholder="Cours phare 4"><br><br>
-
-            <label>Avez-vous soutenu un mémoire ?</label>
-            <input type="checkbox" class="has_thesis" onchange="toggleThesis(this)"><br><br>
-
-            <div class="thesis-section" style="display: none;">
-                <label>Sujet du mémoire :</label><br>
-                <input type="text" name="thesis_subject[]" placeholder="Sujet du mémoire"><br><br>
-
-                <label>Nom(s) et email(s) des encadreurs :</label><br>
-                <input type="text" name="thesis_supervisors[]" placeholder="Encadreur(s)"><br><br>
+            <div class="flex space-x-4">
+                <div class="flex-1">
+                <label class="font-semibold">Année de début :</label>
+                <input type="text" name="start_year[]" value="{{ edu.start_year | default('') }}" class="w-full border p-2 rounded mb-3">
+                </div>
+                <div class="flex-1">
+                <label class="font-semibold">Année d'obtention :</label>
+                <input type="text" name="end_year[]" value="{{ edu.end_year | default('') }}" class="w-full border p-2 rounded mb-3">
+                </div>
             </div>
 
-            <hr>
-        </div>
-    </div>
+            <label class="block font-semibold mb-1">Formation en cours :</label>
+            <input type="checkbox" name="in_progress[]" {% if edu.in_progress %}checked{% endif %} class="mb-3">
 
-    <button type="button" onclick="addEducation()">➕ Ajouter une formation</button>
-    <br><br>
-    <button type="submit">Suivant ➡️</button>
-</form>
+            <label class="font-semibold block">Cours phares :</label>
+            <div class="grid grid-cols-2 gap-4 mb-3">
+                {% set courses = edu.courses or ['', '', '', ''] %}
+                <input type="text" name="course1[]" value="{{ courses[0] }}" class="border p-2 rounded">
+                <input type="text" name="course2[]" value="{{ courses[1] }}" class="border p-2 rounded">
+                <input type="text" name="course3[]" value="{{ courses[2] }}" class="border p-2 rounded">
+                <input type="text" name="course4[]" value="{{ courses[3] }}" class="border p-2 rounded">
+            </div>
+
+            <label class="block font-semibold">Avez-vous soutenu un mémoire ?</label>
+            <input type="checkbox" class="has_thesis mb-3" onchange="toggleThesis(this)" {% if edu.thesis_subject or edu.thesis_supervisors %}checked{% endif %}>
+
+            <div class="thesis-section {% if not edu.thesis_subject and not edu.thesis_supervisors %}hidden{% endif %} mt-3">
+                <label class="font-semibold">Sujet du mémoire :</label>
+                <input type="text" name="thesis_subject[]" value="{{ edu.thesis_subject }}" class="w-full border p-2 rounded mb-3">
+
+                <label class="font-semibold">Nom(s) et email(s) des encadreurs :</label>
+                <input type="text" name="thesis_supervisors[]" value="{{ edu.thesis_supervisors }}" class="w-full border p-2 rounded">
+            </div>
+            </div>
+            {% endfor %}
+
+            </div>
+
+            <label class="block font-semibold mb-1">Formation en cours :</label>
+            <input type="checkbox" name="in_progress[]" class="mb-3">
+
+            <label class="font-semibold block">Cours phares :</label>
+            <div class="grid grid-cols-2 gap-4 mb-3">
+              <input type="text" name="course1[]" placeholder="Cours phare 1" class="border p-2 rounded">
+              <input type="text" name="course2[]" placeholder="Cours phare 2" class="border p-2 rounded">
+              <input type="text" name="course3[]" placeholder="Cours phare 3" class="border p-2 rounded">
+              <input type="text" name="course4[]" placeholder="Cours phare 4" class="border p-2 rounded">
+            </div>
+
+            <label class="block font-semibold">Avez-vous soutenu un mémoire ?</label>
+            <input type="checkbox" class="has_thesis mb-3" onchange="toggleThesis(this)">
+
+            <div class="thesis-section hidden mt-3">
+              <label class="font-semibold">Sujet du mémoire :</label>
+              <input type="text" name="thesis_subject[]" class="w-full border p-2 rounded mb-3">
+
+              <label class="font-semibold">Nom(s) et email(s) des encadreurs :</label>
+              <input type="text" name="thesis_supervisors[]" class="w-full border p-2 rounded">
+            </div>
+          </div>
+                <button type="button" onclick="addEducation()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          ➕ Ajouter une formation
+        </button>
+
+        <div class="mt-6">
+          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Suivant ⏩</button>
+        </div>
+        </div>
+
+      </form>
+    </div>
+  </main>
+</div>
 
 <script>
-function addEducation() {
-    const div = document.createElement('div');
-    div.className = 'educationEntry';
-    div.innerHTML = `
-        <label>Diplôme :</label><br>
-        <input type="text" name="degree[]" required><br><br>
-
-        <label>Établissement :</label><br>
-        <input type="text" name="school[]" required><br><br>
-
-        <label>Année de début :</label><br>
-        <input type="text" name="start_year[]" required><br><br>
-
-        <label>Année d'obtention :</label><br>
-        <input type="text" name="end_year[]"><br><br>
-
-        <label>Formation en cours :</label>
-        <input type="checkbox" name="in_progress[]"><br><br>
-
-        <label>Cours phares :</label><br>
-        <input type="text" name="course1[]" placeholder="Cours phare 1"><br><br>
-        <input type="text" name="course2[]" placeholder="Cours phare 2"><br><br>
-        <input type="text" name="course3[]" placeholder="Cours phare 3"><br><br>
-        <input type="text" name="course4[]" placeholder="Cours phare 4"><br><br>
-
-        <label>Avez-vous soutenu un mémoire ?</label>
-        <input type="checkbox" class="has_thesis" onchange="toggleThesis(this)"><br><br>
-
-        <div class="thesis-section" style="display: none;">
-            <label>Sujet du mémoire :</label><br>
-            <input type="text" name="thesis_subject[]" placeholder="Sujet du mémoire"><br><br>
-
-            <label>Nom(s) des encadreurs :</label><br>
-            <input type="text" name="thesis_supervisors[]" placeholder="Encadreur(s)"><br><br>
-        </div>
-
-        <hr>
-    `;
-    document.getElementById('educationFields').appendChild(div);
+function toggleThesis(checkbox) {
+  const thesisDiv = checkbox.closest('.educationEntry').querySelector('.thesis-section');
+  if (thesisDiv) {
+    thesisDiv.classList.toggle('hidden', !checkbox.checked);
+  }
 }
 
-function toggleThesis(checkbox) {
-    const thesisDiv = checkbox.parentElement.querySelector('.thesis-section');
-    if (thesisDiv) {
-        thesisDiv.style.display = checkbox.checked ? 'block' : 'none';
+function addEducation() {
+  const container = document.getElementById('educationFields');
+  const clone = container.firstElementChild.cloneNode(true);
+
+  // Clear all input values
+  clone.querySelectorAll('input').forEach(input => {
+    if (input.type === 'checkbox') {
+      input.checked = false;
+    } else {
+      input.value = '';
     }
+  });
+
+  // Hide thesis section
+  clone.querySelector('.thesis-section').classList.add('hidden');
+  container.appendChild(clone);
 }
 </script>
-{% endblock %}
+
+</body>
+</html>

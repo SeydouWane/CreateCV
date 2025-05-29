@@ -1,58 +1,110 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Étape 5 : Projets ou Distinctions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-{% block content %}
-<h2>Étape 5 : Distinctions ou Projets</h2>
+<div class="flex min-h-screen">
 
-<form method="POST" id="projectForm">
-    <div id="projectFields">
-        <div class="projectEntry">
-            <label>Type :</label>
-            <select name="type[]">
-                <option value="Projet">Projet</option>
-                <option value="Distinction">Distinction</option>
-            </select><br><br>
+  <!-- Sidebar -->
+  <aside class="w-72 bg-white shadow-lg p-6 border-r">
+    <h2 class="text-xl font-bold text-gray-800 mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-[16px] font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="text-blue-600 font-semibold">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
+    </ul>
+  </aside>
 
-            <label>Titre :</label><br>
-            <input type="text" name="title[]" ><br><br>
+  <!-- Contenu principal -->
+  <main class="flex-1 p-10">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow-lg">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">🏆 Étape 5 : Distinctions ou Projets</h1>
 
-            <label>Description :</label><br>
-            <textarea name="description[]" rows="3" cols="50" placeholder="Décris brièvement..."></textarea><br><br>
+      <form method="POST" id="projectForm">
+        <div id="projectFields" class="space-y-6">
+        {% for d in distinctions %}
+        <div class="projectEntry border border-gray-300 p-6 bg-gray-50 rounded-lg">
+            <div class="mb-4">
+            <label class="block mb-1 font-medium text-gray-700">Type :</label>
+            <select name="type[]" class="w-full border-gray-300 rounded p-2">
+                <option value="Projet" {% if d.type == 'Projet' %}selected{% endif %}>Projet</option>
+                <option value="Distinction" {% if d.type == 'Distinction' %}selected{% endif %}>Distinction</option>
+            </select>
+            </div>
 
-            <label>Année :</label><br>
-            <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
+            <div class="mb-4">
+            <label class="block mb-1 font-medium text-gray-700">Titre :</label>
+            <input type="text" name="title[]" class="w-full border border-gray-300 p-2 rounded" value="{{ d.title | default('') }}" placeholder="Ex : Meilleur projet IA 2024">
+            </div>
 
-            <hr>
+            <div class="mb-4">
+            <label class="block mb-1 font-medium text-gray-700">Description :</label>
+            <textarea name="description[]" rows="3" class="w-full border border-gray-300 p-2 rounded" placeholder="Décris brièvement...">{{ d.description | default('') }}</textarea>
+            </div>
+
+            <div>
+            <label class="block mb-1 font-medium text-gray-700">Année :</label>
+            <input type="text" name="year[]" class="w-full border border-gray-300 p-2 rounded" value="{{ d.year | default('') }}" placeholder="ex: 2023">
+            </div>
         </div>
-    </div>
+        {% endfor %}
+        </div>
 
-    <button type="button" onclick="addProject()">➕ Ajouter un projet ou une distinction</button>
-    <br><br>
-    <button type="submit">Suivant ➡️</button>
-</form>
+        <!-- Boutons -->
+        <div class="flex flex-col md:flex-row justify-between items-center mt-8 space-y-4 md:space-y-0">
+          <button type="button" onclick="addProject()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+            ➕ Ajouter un projet ou une distinction
+          </button>
+
+          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow">
+            Suivant ⏩
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
 
 <script>
 function addProject() {
-    const div = document.createElement('div');
-    div.className = 'projectEntry';
-    div.innerHTML = `
-        <label>Type :</label>
-        <select name="type[]">
-            <option value="Projet">Projet</option>
-            <option value="Distinction">Distinction</option>
-        </select><br><br>
+  const div = document.createElement('div');
+  div.className = 'projectEntry border border-gray-300 p-6 bg-gray-50 rounded-lg mt-6';
+  div.innerHTML = `
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-gray-700">Type :</label>
+      <select name="type[]" class="w-full border-gray-300 rounded p-2">
+        <option value="Projet">Projet</option>
+        <option value="Distinction">Distinction</option>
+      </select>
+    </div>
 
-        <label>Titre :</label><br>
-        <input type="text" name="title[]" required><br><br>
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-gray-700">Titre :</label>
+      <input type="text" name="title[]" class="w-full border border-gray-300 p-2 rounded" placeholder="Ex : Concours Hackathon 2024">
+    </div>
 
-        <label>Description :</label><br>
-        <textarea name="description[]" rows="3" cols="50" placeholder="Décris brièvement..."></textarea><br><br>
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-gray-700">Description :</label>
+      <textarea name="description[]" rows="3" class="w-full border border-gray-300 p-2 rounded" placeholder="Décris brièvement..."></textarea>
+    </div>
 
-        <label>Année :</label><br>
-        <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
-
-        <hr>
-    `;
-    document.getElementById('projectFields').appendChild(div);
+    <div>
+      <label class="block mb-1 font-medium text-gray-700">Année :</label>
+      <input type="text" name="year[]" class="w-full border border-gray-300 p-2 rounded" placeholder="ex: 2022">
+    </div>
+  `;
+  document.getElementById('projectFields').appendChild(div);
 }
 </script>
-{% endblock %}
+
+</body>
+</html>

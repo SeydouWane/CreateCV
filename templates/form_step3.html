@@ -1,32 +1,72 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Étape 3 : Compétences</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-{% block content %}
-<h2>Étape 3 : Compétences</h2>
+<div class="flex min-h-screen">
 
-<form method="POST" id="skillsForm">
-    <div id="skillsFields">
-        <div class="skillEntry">
-            <label>Compétence :</label><br>
-            <input type="text" name="skills[]" required><br><br>
-            <hr>
+  <!-- Sidebar -->
+  <aside class="w-72 bg-white shadow-md p-6 border-r">
+    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-base font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="text-blue-600 font-bold">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
+    </ul>
+  </aside>
+
+  <!-- Contenu principal -->
+  <!-- Contenu principal -->
+<main class="flex-1 p-10">
+  <div class="max-w-2xl mx-auto bg-white p-8 rounded shadow">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">Étape 3 : Compétences</h1>
+
+    <!-- ✅ FORMULAIRE AJOUTÉ ICI -->
+    <form method="POST">
+      <div id="skillsFields" class="space-y-6">
+        {% for skill in skills %}
+        <div class="skillEntry border p-4 rounded bg-gray-50">
+          <label class="font-semibold block mb-2">Compétence :</label>
+          <input type="text" name="skills[]" value="{{ skill }}" required class="w-full border p-2 rounded">
         </div>
-    </div>
+        {% endfor %}
+      </div>
 
-    <button type="button" onclick="addSkill()">➕ Ajouter une compétence</button>
-    <br><br>
-    <button type="submit">Suivant ➡️</button>
-</form>
+      <button type="button" onclick="addSkill()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        ➕ Ajouter une compétence
+      </button>
+
+      <div class="mt-6">
+        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Suivant ⏩</button>
+      </div>
+    </form>
+    <!-- ✅ FIN DU FORMULAIRE -->
+  </div>
+</main>
+
+</div>
 
 <script>
 function addSkill() {
-    var div = document.createElement('div');
-    div.className = 'skillEntry';
-    div.innerHTML = `
-        <label>Compétence :</label><br>
-        <input type="text" name="skills[]" required><br><br>
-        <hr>
-    `;
-    document.getElementById('skillsFields').appendChild(div);
+  const container = document.getElementById('skillsFields');
+  const div = document.createElement('div');
+  div.className = "skillEntry border p-4 rounded bg-gray-50";
+  div.innerHTML = `
+    <label class="font-semibold block mb-2">Compétence :</label>
+    <input type="text" name="skills[]" required class="w-full border p-2 rounded">
+  `;
+  container.appendChild(div);
 }
 </script>
-{% endblock %}
+
+</body>
+</html>

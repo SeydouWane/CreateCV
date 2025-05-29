@@ -1,24 +1,99 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Étape 1 - Informations Personnelles</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
 
-{% block content %}
-<h2>Étape 1 : Informations Personnelles</h2>
+  <!-- Sidebar -->
+  <aside class="w-72 bg-white shadow-md p-6 border-r h-screen">
+    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-base font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600 {% if request.path == '/step1' %}text-blue-600 font-bold{% endif %}">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600 {% if request.path == '/step1a' %}text-blue-600 font-bold{% endif %}">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
+    </ul>
+  </aside>
 
-<form method="POST" enctype="multipart/form-data">
-    <label>Nom :</label><br>
-    <input type="text" name="name" value="{{ personal_info.get('name', '') }}" required><br><br>
 
-    <label>Email :</label><br>
-    <input type="email" name="email" value="{{ personal_info.get('email', '') }}" required><br><br>
+  <!-- Main Content -->
+  <main class="flex-1 flex items-center justify-center px-6 py-10">
+    <div class="bg-white w-full max-w-2xl p-10 rounded-lg shadow space-y-6">
+      <h1 class="text-3xl font-bold text-gray-800 text-center border-b pb-4">Étape 1 : Informations Personnelles</h1>
 
-    <label>Téléphone :</label><br>
-    <input type="text" name="phone" value="{{ personal_info.get('phone', '') }}" required><br><br>
+      <form method="POST" enctype="multipart/form-data" class="space-y-5">
+        <!-- Nom -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">NOM et Prenom :</label>
+          <input type="text" name="name" value="{{ personal_info.get('name', '') }}"
+                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
 
-    <label>LinkedIn :</label><br>
-    <input type="text" name="linkedin" value="{{ personal_info.get('linkedin', '') }}"><br><br>
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email :</label>
+          <input type="email" name="email" value="{{ personal_info.get('email', '') }}"
+                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
 
-    <label>Photo professionnelle (optionnelle) :</label><br>
-    <input type="file" name="photo"><br><br>
+        <!-- Téléphone -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Téléphone :</label>
+          <input type="text" name="phone" value="{{ personal_info.get('phone', '') }}"
+                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
 
-    <button type="submit">Suivant ➡️</button>
-</form>
-{% endblock %}
+        <!-- Résidence -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Lieu de résidence :</label>
+          <input type="text" name="location" value="{{ personal_info.get('location', '') }}"
+                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <!-- Titre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Titre professionnel (optionnel) :</label>
+          <input type="text" name="title" value="{{ personal_info.get('title', '') }}"
+                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <!-- LinkedIn -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Lien LinkedIn :</label>
+          <input type="text" name="linkedin" value="{{ personal_info.get('linkedin', '') }}"
+                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <!-- Site Web -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Site web personnel (optionnel) :</label>
+          <input type="url" name="website" value="{{ personal_info.get('website', '') }}"
+                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <!-- Photo -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Photo professionnelle (optionnelle) :</label>
+          <input type="file" name="photo"
+                 class="mt-1 w-full file:bg-indigo-50 file:border file:rounded-md file:px-4 file:py-1 file:text-indigo-700 text-sm">
+        </div>
+
+        <!-- Suivant -->
+        <div class="pt-4">
+          <button type="submit"
+                  class="w-full bg-indigo-600 text-white font-semibold py-2 rounded-md hover:bg-indigo-700 transition">
+            Suivant ➡️
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

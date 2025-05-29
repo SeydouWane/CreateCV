@@ -1,52 +1,88 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Étape 6 : Certificats</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-{% block content %}
-<h2>Étape 6 : Certificats & Certifications</h2>
+<div class="flex min-h-screen">
 
-<form method="POST" id="certificationForm">
-    <div id="certificationFields">
-        <div class="certificationEntry">
-            <label>Nom du certificat :</label><br>
-            <input type="text" name="name[]" ><br><br>
+  <!-- Sidebar -->
+  <aside class="w-72 bg-white shadow-md p-6 border-r">
+    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-base font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="text-blue-600 font-bold">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
+    </ul>
+  </aside>
 
-            <label>Organisme :</label><br>
-            <input type="text" name="issuer[]" ><br><br>
+  <!-- Contenu principal -->
+  <main class="flex-1 p-10">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded shadow">
+      <h1 class="text-2xl font-bold mb-6 text-gray-800">📜 Étape 6 : Certificats & Certifications</h1>
 
-            <label>Année d’obtention :</label><br>
-            <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
+      <form method="POST" id="certificationForm">
+        <div id="certificationFields" class="space-y-6">
+        {% for c in certifications %}
+        <div class="certificationEntry bg-gray-50 border p-6 rounded">
+            <label class="block font-semibold mb-1">Nom du certificat :</label>
+            <input type="text" name="name[]" class="w-full border p-2 rounded mb-4" value="{{ c.name | default('') }}" required>
 
-            <label>Lien (optionnel) :</label><br>
-            <input type="url" name="link[]" placeholder="https://..."><br><br>
+            <label class="block font-semibold mb-1">Organisme :</label>
+            <input type="text" name="issuer[]" class="w-full border p-2 rounded mb-4" value="{{ c.issuer | default('') }}" required>
 
-            <hr>
+            <label class="block font-semibold mb-1">Année d’obtention :</label>
+            <input type="text" name="year[]" placeholder="ex: 2023" class="w-full border p-2 rounded mb-4" value="{{ c.year | default('') }}">
+
+            <label class="block font-semibold mb-1">Lien (optionnel) :</label>
+            <input type="url" name="link[]" placeholder="https://..." class="w-full border p-2 rounded" value="{{ c.link | default('') }}">
         </div>
-    </div>
+        {% endfor %}
+        </div>
 
-    <button type="button" onclick="addCertification()">➕ Ajouter une certification</button>
-    <br><br>
-    <button type="submit">Valider</button>
-</form>
+
+        <div class="flex flex-col md:flex-row justify-between items-center mt-8 space-y-4 md:space-y-0">
+          <button type="button" onclick="addCertification()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+            ➕ Ajouter une certification
+          </button>
+
+          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow">
+            Valider ✅
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
 
 <script>
 function addCertification() {
-    const div = document.createElement('div');
-    div.className = 'certificationEntry';
-    div.innerHTML = `
-        <label>Nom du certificat :</label><br>
-        <input type="text" name="name[]" required><br><br>
+  const div = document.createElement('div');
+  div.className = 'certificationEntry bg-gray-50 border p-6 rounded mt-4';
+  div.innerHTML = `
+    <label class="block font-semibold mb-1">Nom du certificat :</label>
+    <input type="text" name="name[]" class="w-full border p-2 rounded mb-4" required>
 
-        <label>Organisme :</label><br>
-        <input type="text" name="issuer[]" required><br><br>
+    <label class="block font-semibold mb-1">Organisme :</label>
+    <input type="text" name="issuer[]" class="w-full border p-2 rounded mb-4" required>
 
-        <label>Année d’obtention :</label><br>
-        <input type="text" name="year[]" placeholder="ex: 2023"><br><br>
+    <label class="block font-semibold mb-1">Année d’obtention :</label>
+    <input type="text" name="year[]" placeholder="ex: 2023" class="w-full border p-2 rounded mb-4">
 
-        <label>Lien (optionnel) :</label><br>
-        <input type="url" name="link[]" placeholder="https://..."><br><br>
-
-        <hr>
-    `;
-    document.getElementById('certificationFields').appendChild(div);
+    <label class="block font-semibold mb-1">Lien (optionnel) :</label>
+    <input type="url" name="link[]" placeholder="https://..." class="w-full border p-2 rounded">
+  `;
+  document.getElementById('certificationFields').appendChild(div);
 }
 </script>
-{% endblock %}
+
+</body>
+</html>

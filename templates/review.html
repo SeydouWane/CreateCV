@@ -1,120 +1,144 @@
-{% extends 'base.html' %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Aperçu CV</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-<!-- HEADER -->
-<div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
-    {% if data.personal_info.photo_filename %}
-    <div style="margin-right: 20px;">
-        <img src="{{ url_for('static', filename='uploads/' + data.personal_info.photo_filename) }}" alt="Photo" width="120">
-    </div>
-    {% endif %}
-    <div>
-        <h1 style="margin: 0;">{{ data.personal_info.name }}</h1>
-        <p>{{ data.personal_info.phone }} | {{ data.personal_info.email }}<br>
-        <a href="{{ data.personal_info.linkedin }}" target="_blank">{{ data.personal_info.linkedin }}</a></p>
-    </div>
-</div>
+<div class="flex min-h-screen">
 
-<hr>
-
-
-<!-- COMPETENCES -->
-{% if data.skills %}
-<h2>Compétences</h2>
-<ul>
-    {% for skill in data.skills %}
-    <li>{{ skill }}</li>
-    {% endfor %}
-</ul>
-<hr>
-{% endif %}
-
-<!-- LANGUES -->
-{% if data.languages %}
-<h2>Langues</h2>
-<ul>
-    {% for lang in data.languages %}
-    <li>
-        <strong>{{ lang.name }}</strong> :
-        {% if lang.speak %} Parlé {% endif %}
-        {% if lang.read %} Lu {% endif %}
-        {% if lang.write %} Écrit {% endif %}
-    </li>
-    {% endfor %}
-</ul>
-<hr>
-{% endif %}
-
-<!-- EXPERIENCES -->
-{% if data.experiences %}
-<h2>Expériences professionnelles</h2>
-{% for exp in data.experiences %}
-<div style="margin-bottom: 15px;">
-    <strong>{{ exp.title }}</strong> – {{ exp.company }} ({{ exp.location }})<br>
-    <small>{{ exp.type }} | {{ exp.start_date }} {% if exp.current %}– Aujourd’hui{% else %}– {{ exp.end_date }}{% endif %}</small>
-    {% if exp.description %}<p><em>{{ exp.description }}</em></p>{% endif %}
-    {% if exp.ref_name and exp.ref_contact %}
-    <p><strong>Référence :</strong> {{ exp.ref_name }} – {{ exp.ref_contact }}</p>
-    {% endif %}
-</div>
-{% endfor %}
-<hr>
-{% endif %}
-
-<!-- PROJETS & DISTINCTIONS -->
-{% if data.distinctions %}
-<h2>Projets & Distinctions</h2>
-{% for item in data.distinctions %}
-<div style="margin-bottom: 10px;">
-    <strong>{{ item.title }}</strong> – {{ item.year }} <em>({{ item.type }})</em><br>
-    {% if item.description %}
-    <p>{{ item.description }}</p>
-    {% endif %}
-</div>
-{% endfor %}
-<hr>
-{% endif %}
-
-<!-- FORMATIONS -->
-{% if data.education %}
-<h2>Formations</h2>
-{% for edu in data.education %}
-<div style="margin-bottom: 10px;">
-    <strong>{{ edu.degree }}</strong> – {{ edu.school }} <br>
-    <small>{{ edu.start_year }}{% if edu.in_progress %} – en cours{% else %} – {{ edu.end_year }}{% endif %}</small>
-    {% if edu.courses %}
-    <ul>
-        {% for course in edu.courses %}
-        {% if course %}<li>{{ course }}</li>{% endif %}
-        {% endfor %}
+  <!-- SIDEBAR -->
+  <aside class="w-72 bg-white shadow-md p-6 border-r">
+    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-base font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="text-blue-600 font-bold">📄 Revue finale</a></li>
     </ul>
-    {% endif %}
+  </aside>
+
+  <!-- CONTENU -->
+  <main class="flex-1 p-10">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow">
+
+      <!-- HEADER -->
+      <div class="flex items-start mb-6">
+        {% if data.personal_info.photo_filename %}
+        <img src="{{ url_for('static', filename='uploads/' + data.personal_info.photo_filename) }}" alt="Photo" class="w-24 h-24 rounded mr-6 object-cover">
+        {% endif %}
+        <div>
+          <h1 class="text-3xl font-bold">{{ data.personal_info.name }}</h1>
+          <p class="text-gray-600">{{ data.personal_info.phone }} | {{ data.personal_info.email }}</p>
+          {% if data.personal_info.linkedin %}
+          <a href="{{ data.personal_info.linkedin }}" class="text-blue-600 underline" target="_blank">{{ data.personal_info.linkedin }}</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- COMPETENCES -->
+      {% if data.skills %}
+      <h2 class="text-xl font-semibold mt-6 mb-2">🛠️ Compétences</h2>
+      <ul class="list-disc list-inside text-gray-700">
+        {% for skill in data.skills %}
+        <li>{{ skill }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <!-- LANGUES -->
+      {% if data.languages %}
+      <h2 class="text-xl font-semibold mt-6 mb-2">🌐 Langues</h2>
+      <ul class="list-disc list-inside text-gray-700">
+        {% for lang in data.languages %}
+        <li>
+          <strong>{{ lang.name }}</strong> :
+          {% if lang.speak %} Parlé {% endif %}
+          {% if lang.read %} Lu {% endif %}
+          {% if lang.write %} Écrit {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <!-- EXPERIENCES -->
+      {% if data.experiences %}
+      <h2 class="text-xl font-semibold mt-6 mb-2">🏢 Expériences professionnelles</h2>
+      {% for exp in data.experiences %}
+      <div class="mb-4">
+        <p class="font-semibold">{{ exp.title }}</p>
+        <p class="text-sm text-gray-600">{{ exp.company }} — {{ exp.location }} | {{ exp.type }}</p>
+        <p class="text-sm text-gray-500">
+          {{ exp.start_date }} {% if exp.current %}– Aujourd’hui{% else %}– {{ exp.end_date }}{% endif %}
+        </p>
+        {% if exp.description %}
+        <p class="mt-1 text-gray-700 text-sm whitespace-pre-line">{{ exp.description }}</p>
+        {% endif %}
+        {% if exp.ref_name %}
+        <p class="text-sm mt-1"><strong>Référence :</strong> {{ exp.ref_name }} – {{ exp.ref_contact }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <!-- PROJETS -->
+      {% if data.distinctions %}
+      <h2 class="text-xl font-semibold mt-6 mb-2">🏆 Projets & Distinctions</h2>
+      {% for item in data.distinctions %}
+      <div class="mb-3">
+        <p class="font-semibold">{{ item.title }} – <span class="text-gray-600">{{ item.year }}</span> <em class="text-sm">({{ item.type }})</em></p>
+        {% if item.description %}
+        <p class="text-sm text-gray-700">{{ item.description }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <!-- FORMATIONS -->
+      {% if data.education %}
+      <h2 class="text-xl font-semibold mt-6 mb-2">🎓 Formations</h2>
+      {% for edu in data.education %}
+      <div class="mb-3">
+        <p class="font-semibold">{{ edu.degree }} – {{ edu.school }}</p>
+        <p class="text-sm text-gray-600">{{ edu.start_year }} {% if edu.in_progress %}– en cours{% else %}– {{ edu.end_year }}{% endif %}</p>
+        <ul class="list-disc list-inside text-sm text-gray-700 mt-1">
+          {% for course in edu.courses %}
+          {% if course %}<li>{{ course }}</li>{% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <!-- CERTIFICATIONS -->
+      {% if data.certifications %}
+      <h2 class="text-xl font-semibold mt-6 mb-2">📜 Certifications</h2>
+      {% for cert in data.certifications %}
+      <div class="mb-3">
+        <p class="font-semibold">{{ cert.name }} – {{ cert.issuer }}{% if cert.year %} ({{ cert.year }}){% endif %}</p>
+        {% if cert.link %}
+        <a href="{{ cert.link }}" target="_blank" class="text-blue-600 text-sm">🔗 Voir certificat</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <!-- BOUTON PDF -->
+      <div class="mt-8 text-center">
+        <a href="/generate_cv" class="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 text-lg font-semibold">
+          📄 Télécharger le CV (PDF)
+        </a>
+      </div>
+
+    </div>
+  </main>
 </div>
-{% endfor %}
-<hr>
-{% endif %}
 
-
-
-<!-- CERTIFICATIONS -->
-{% if data.certifications %}
-<h2>Certifications</h2>
-{% for cert in data.certifications %}
-<div style="margin-bottom: 10px;">
-    <strong>{{ cert.name }}</strong> – {{ cert.issuer }}{% if cert.year %} ({{ cert.year }}){% endif %}<br>
-    {% if cert.link %}
-    <a href="{{ cert.link }}" target="_blank">Voir le certificat</a>
-    {% endif %}
-</div>
-{% endfor %}
-<hr>
-{% endif %}
-
-<!-- TELECHARGEMENT -->
-<div style="text-align: center; margin-top: 30px;">
-    <a href="/generate_cv">
-        <button style="padding: 10px 20px; font-size: 16px;">📄 Télécharger le CV</button>
-    </a>
-</div>
-
-{% endblock %}
+</body>
+</html>

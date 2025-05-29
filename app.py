@@ -44,14 +44,18 @@ def step1a():
         for i, name in enumerate(language_names):
             language_info = {
                 'name': name,
-                'speak': True if f'speak_{i}' in request.form else False,
-                'read': True if f'read_{i}' in request.form else False,
-                'write': True if f'write_{i}' in request.form else False,
+                'speak': f'speak_{i}' in request.form,
+                'read': f'read_{i}' in request.form,
+                'write': f'write_{i}' in request.form
             }
             languages.append(language_info)
         session['languages'] = languages
         return redirect('/step2')
-    return render_template('form_step1a.html')
+
+    # GET : on récupère les valeurs stockées
+    languages = session.get('languages', [{'name': '', 'speak': False, 'read': False, 'write': False}])
+    return render_template('form_step1a.html', languages=languages)
+
 
 @app.route('/step2', methods=['GET', 'POST'])
 def step2():
@@ -74,7 +78,7 @@ def step2():
                 'degree': degrees[i],
                 'school': schools[i],
                 'start_year': start_years[i],
-                'end_year': end_years[i] if end_years[i] else None,
+                'end_year': end_years[i],
                 'in_progress': i < len(in_progress_list),
                 'courses': [courses1[i], courses2[i], courses3[i], courses4[i]],
                 'thesis_subject': thesis_subjects[i] if i < len(thesis_subjects) else '',
@@ -84,7 +88,10 @@ def step2():
 
         session['education'] = education_list
         return redirect('/step3')
-    return render_template('form_step2.html')
+
+    # 🧠 Passer les données précédentes à la vue
+    education = session.get('education', [{}])
+    return render_template('form_step2.html', education=education)
 
 
 @app.route('/step3', methods=['GET', 'POST'])
@@ -92,8 +99,12 @@ def step3():
     if request.method == 'POST':
         skills = request.form.getlist('skills[]')
         session['skills'] = skills
-        return redirect('/step4')
-    return render_template('form_step3.html')
+        return redirect('/step4')  # ou la page suivante
+
+    # Charger les données existantes si présentes
+    skills = session.get('skills', [''])
+    return render_template('form_step3.html', skills=skills)
+
 
 @app.route('/step4', methods=['GET', 'POST'])
 def step4():
@@ -105,28 +116,32 @@ def step4():
         types = request.form.getlist('type[]')
         start_dates = request.form.getlist('start_date[]')
         end_dates = request.form.getlist('end_date[]')
-        currents = request.form.getlist('current[]')
+        currents = request.form.getlist('current[]')  # seulement cochés
         descriptions = request.form.getlist('description[]')
         ref_names = request.form.getlist('ref_name[]')
         ref_contacts = request.form.getlist('ref_contact[]')
+
         for i in range(len(titles)):
-            if not titles[i].strip() and not companies[i].strip():
-                continue
             experiences.append({
                 'title': titles[i],
                 'company': companies[i],
                 'location': locations[i],
                 'type': types[i],
                 'start_date': start_dates[i],
-                'end_date': end_dates[i] if end_dates[i] else None,
-                'current': True if i < len(currents) else False,
+                'end_date': end_dates[i],
+                'current': str(i) in currents,  # coché si son index figure
                 'description': descriptions[i],
                 'ref_name': ref_names[i],
                 'ref_contact': ref_contacts[i]
             })
+
         session['experiences'] = experiences
         return redirect('/step5')
-    return render_template('form_step4.html')
+
+    # GET : on récupère les expériences mémorisées
+    experiences = session.get('experiences', [{}])
+    return render_template('form_step4.html', experiences=experiences)
+
 
 @app.route('/step5', methods=['GET', 'POST'])
 def step5():
@@ -136,6 +151,7 @@ def step5():
         descriptions = request.form.getlist('description[]')
         years = request.form.getlist('year[]')
         types = request.form.getlist('type[]')
+
         for i in range(len(titles)):
             if not titles[i].strip():
                 continue
@@ -145,9 +161,14 @@ def step5():
                 'year': years[i],
                 'type': types[i]
             })
+
         session['distinctions'] = distinctions
         return redirect('/step6')
-    return render_template('form_step5.html')
+
+    # GET : on récupère les valeurs mémorisées
+    distinctions = session.get('distinctions', [{}])
+    return render_template('form_step5.html', distinctions=distinctions)
+
 
 @app.route('/step6', methods=['GET', 'POST'])
 def step6():
@@ -157,6 +178,7 @@ def step6():
         issuers = request.form.getlist('issuer[]')
         years = request.form.getlist('year[]')
         links = request.form.getlist('link[]')
+
         for i in range(len(names)):
             if not names[i].strip():
                 continue
@@ -166,30 +188,41 @@ def step6():
                 'year': years[i],
                 'link': links[i]
             })
+
         session['certifications'] = certifications
         return redirect('/review')
-    return render_template('form_step6.html')
+
+    # GET
+    certifications = session.get('certifications', [{}])
+    return render_template('form_step6.html', certifications=certifications)
+
 
 @app.route('/review')
 def review():
     return render_template('review.html', data=session)
 
 
+from datetime import datetime
 
 @app.route('/generate_cv')
 def generate_cv():
     data = session.copy()
 
-    # Si la photo est présente, passer un chemin absolu
-    if 'photo_filename' in data.get('personal_info', {}):
+    # Traitement de l'image
+    if 'photo_filename' in data.get('personal_info', {}) and data['personal_info']['photo_filename']:
         filename = data['personal_info']['photo_filename']
         full_path = os.path.join(app.root_path, 'static', 'uploads', filename)
         data['personal_info']['photo_path'] = full_path
     else:
         data['personal_info']['photo_path'] = None
 
-    rendered = render_template('cv_template.html', data=data)
+    # ✅ Nouvelle ligne : ajouter la date du jour
+    today = datetime.now().strftime('%d/%m/%Y')
 
+    # Rendu HTML
+    rendered = render_template('cv_template.html', data=data, today=today)
+
+    # Conversion PDF
     pdf = BytesIO()
     pisa_status = pisa.CreatePDF(rendered, dest=pdf)
 
@@ -200,7 +233,6 @@ def generate_cv():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline; filename=cv.pdf'
     return response
-
 
 
 if __name__ == '__main__':

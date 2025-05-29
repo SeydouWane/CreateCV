@@ -1,73 +1,105 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Étape 1A : Langues</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-{% block content %}
-<h2>Étape 1A : Langues</h2>
+<div class="flex min-h-screen">
 
-<form method="POST" id="languagesForm">
-    <div id="languagesFields">
-        <div class="languageEntry">
-            <label>Langue :</label><br>
-            <select name="language_name[]" required>
-                <option value="">-- Choisissez une langue --</option>
-                <option>Français</option>
-                <option>Anglais</option>
-                <option>Espagnol</option>
-                <option>Arabe</option>
-                <option>Wolof</option>
-                <option>Peul</option>
-                <option>Allemand</option>
-                <option>Italien</option>
-                <option>Chinois</option>
-                <option>Portugais</option>
-                <option>Autre</option>
-            </select><br><br>
+  <!-- SIDEBAR CLIQUABLE -->
+  <aside class="w-72 bg-white shadow-md p-6 border-r h-screen">
+    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-base font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600 {% if request.path == '/step1' %}text-blue-600 font-bold{% endif %}">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600 {% if request.path == '/step1a' %}text-blue-600 font-bold{% endif %}">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
+    </ul>
+  </aside>
 
-            <label>Compétences :</label><br>
-            <input type="checkbox" name="speak_0"> Parlé
-            <input type="checkbox" name="read_0"> Lu
-            <input type="checkbox" name="write_0"> Écrit
-            <br><br>
-            <hr>
+  <!-- CONTENU PRINCIPAL -->
+  <main class="flex-1 p-10 overflow-y-auto">
+    <div class="max-w-2xl mx-auto bg-white rounded shadow p-8">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">Étape 1A : Langues</h1>
+
+      <form method="POST" id="languagesForm">
+        <div id="languagesFields" class="space-y-6">
+          {% for lang in languages %}
+          <div class="languageEntry bg-gray-50 p-4 border rounded">
+            <label class="font-semibold block mb-1">Langue :</label>
+            <select name="language_name[]" class="w-full p-2 border rounded mb-3" required>
+              <option value="">-- Choisissez une langue --</option>
+              {% set options = ['Français', 'Anglais', 'Espagnol', 'Arabe', 'Wolof', 'Peul', 'Allemand', 'Italien', 'Chinois', 'Portugais', 'Autre'] %}
+              {% for opt in options %}
+              <option value="{{ opt }}" {% if lang.name == opt %}selected{% endif %}>{{ opt }}</option>
+              {% endfor %}
+            </select>
+
+            <label class="font-semibold block mb-1">Compétences :</label>
+            <div class="space-x-6">
+              <label><input type="checkbox" name="speak_{{ loop.index0 }}" {% if lang.speak %}checked{% endif %}> Parlé</label>
+              <label><input type="checkbox" name="read_{{ loop.index0 }}" {% if lang.read %}checked{% endif %}> Lu</label>
+              <label><input type="checkbox" name="write_{{ loop.index0 }}" {% if lang.write %}checked{% endif %}> Écrit</label>
+            </div>
+          </div>
+          {% endfor %}
         </div>
-    </div>
 
-    <button type="button" onclick="addLanguage()">➕ Ajouter une langue</button>
-    <br><br>
-    <button type="submit">Suivant ➡️</button>
-</form>
+        <button type="button" onclick="addLanguage()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          + Ajouter une langue
+        </button>
+
+        <div class="mt-6">
+          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+            Suivant ⏩
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
 
 <script>
-let languageCount = 1;
+let languageCount = {{ languages | length if languages else 1 }};
 
 function addLanguage() {
-    var div = document.createElement('div');
-    div.className = 'languageEntry';
-    div.innerHTML = `
-        <label>Langue :</label><br>
-        <select name="language_name[]" required>
-            <option value="">-- Choisissez une langue --</option>
-            <option>Français</option>
-            <option>Anglais</option>
-            <option>Espagnol</option>
-            <option>Arabe</option>
-            <option>Wolof</option>
-            <option>Peul</option>
-            <option>Allemand</option>
-            <option>Italien</option>
-            <option>Chinois</option>
-            <option>Portugais</option>
-            <option>Autre</option>
-        </select><br><br>
-
-        <label>Compétences :</label><br>
-        <input type="checkbox" name="speak_${languageCount}"> Parlé
-        <input type="checkbox" name="read_${languageCount}"> Lu
-        <input type="checkbox" name="write_${languageCount}"> Écrit
-        <br><br>
-        <hr>
-    `;
-    document.getElementById('languagesFields').appendChild(div);
-    languageCount++;
+  const container = document.getElementById("languagesFields");
+  const div = document.createElement("div");
+  div.className = "languageEntry bg-gray-50 p-4 border rounded mt-4";
+  div.innerHTML = `
+    <label class="font-semibold block mb-1">Langue :</label>
+    <select name="language_name[]" class="w-full p-2 border rounded mb-3" required>
+      <option value="">-- Choisissez une langue --</option>
+      <option>Français</option>
+      <option>Anglais</option>
+      <option>Espagnol</option>
+      <option>Arabe</option>
+      <option>Wolof</option>
+      <option>Peul</option>
+      <option>Allemand</option>
+      <option>Italien</option>
+      <option>Chinois</option>
+      <option>Portugais</option>
+      <option>Autre</option>
+    </select>
+    <label class="font-semibold block mb-1">Compétences :</label>
+    <div class="space-x-6">
+      <label><input type="checkbox" name="speak_${languageCount}"> Parlé</label>
+      <label><input type="checkbox" name="read_${languageCount}"> Lu</label>
+      <label><input type="checkbox" name="write_${languageCount}"> Écrit</label>
+    </div>
+  `;
+  container.appendChild(div);
+  languageCount++;
 }
 </script>
-{% endblock %}
+
+</body>
+</html>

@@ -1,107 +1,143 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Étape 4 : Expériences professionnelles</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-{% block content %}
-<h2>Étape 4 : Expériences professionnelles</h2>
+<div class="flex min-h-screen">
 
-<form method="POST" id="experienceForm">
-    <div id="experienceFields">
-        <div class="experienceEntry">
-            <label>Poste :</label><br>
-            <input type="text" name="title[]"><br><br>
+  <!-- Sidebar -->
+  <aside class="w-72 bg-white shadow-lg p-6 border-r">
+    <h2 class="text-xl font-bold text-gray-800 mb-6">📝 Création de CV</h2>
+    <ul class="space-y-4 text-base font-medium text-gray-700">
+      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
+      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
+      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
+      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
+      <li><a href="{{ url_for('step4') }}" class="text-blue-600 font-bold">🏢 Étape 4 : Expériences</a></li>
+      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
+      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
+      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
+    </ul>
+  </aside>
 
-            <label>Entreprise :</label><br>
-            <input type="text" name="company[]"><br><br>
+  <!-- Contenu principal -->
+  <main class="flex-1 p-10">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">🏢 Étape 4 : Expériences professionnelles</h1>
 
-            <label>Ville / Pays :</label><br>
-            <input type="text" name="location[]"><br><br>
+      <form method="POST" id="experienceForm">
+        <div id="experienceFields" class="space-y-6">
+        {% for exp in experiences %}
+        <div class="experienceEntry border border-gray-300 p-6 rounded bg-gray-50">
+            <label class="block font-semibold mb-1">Poste :</label>
+            <input type="text" name="title[]" class="w-full border rounded p-2 mb-4" value="{{ exp.title | default('') }}">
 
-            <label>Type de contrat :</label><br>
-            <select name="type[]">
-                <option value="">-- Sélectionner --</option>
-                <option>CDI</option>
-                <option>CDD</option>
-                <option>Stage</option>
-                <option>Freelance</option>
-                <option>Prestation</option>
-                <option>Autre</option>
-            </select><br><br>
+            <label class="block font-semibold mb-1">Entreprise :</label>
+            <input type="text" name="company[]" class="w-full border rounded p-2 mb-4" value="{{ exp.company | default('') }}">
 
-            <label>Date de début :</label><br>
-            <input type="text" name="start_date[]" placeholder="MM/YYYY"><br><br>
+            <label class="block font-semibold mb-1">Ville / Pays :</label>
+            <input type="text" name="location[]" class="w-full border rounded p-2 mb-4" value="{{ exp.location | default('') }}">
 
-            <label>Date de fin :</label><br>
-            <input type="text" name="end_date[]" placeholder="MM/YYYY"><br><br>
+            <label class="block font-semibold mb-1">Type de contrat :</label>
+            <select name="type[]" class="w-full border rounded p-2 mb-4">
+            <option value="">-- Sélectionner --</option>
+            {% for option in ['CDI','CDD','Stage','Freelance','Prestation','Autre'] %}
+                <option value="{{ option }}" {% if exp.type == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+            </select>
 
-            <label>Actuellement en poste :</label>
-            <input type="checkbox" name="current[]"><br><br>
+            <label class="block font-semibold mb-1">Date de début :</label>
+            <input type="text" name="start_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4" value="{{ exp.start_date | default('') }}">
 
-            <label>Description des missions :</label><br>
-            <textarea name="description[]" rows="3" cols="50" placeholder="Décrivez vos responsabilités..."></textarea><br><br>
+            <label class="block font-semibold mb-1">Date de fin :</label>
+            <input type="text" name="end_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4" value="{{ exp.end_date | default('') }}">
 
-            <label>Personne de référence :</label><br>
-            <input type="text" name="ref_name[]" placeholder="Nom de la personne"><br><br>
+            <div class="flex items-center mb-4">
+            <input type="checkbox" name="current[]" class="mr-2" value="{{ loop.index0 }}" {% if exp.current %}checked{% endif %}>
+            <label class="font-medium">Actuellement en poste</label>
+            </div>
 
-            <label>Contact de la référence :</label><br>
-            <input type="text" name="ref_contact[]" placeholder="Email ou téléphone"><br><br>
+            <label class="block font-semibold mb-1">Description des missions :</label>
+            <textarea name="description[]" rows="4" class="w-full border rounded p-2 mb-4" placeholder="- Exemple...">{{ exp.description | default('') }}</textarea>
 
-            <hr>
+            <label class="block font-semibold mb-1">Personne de référence :</label>
+            <input type="text" name="ref_name[]" placeholder="Nom de la personne" class="w-full border rounded p-2 mb-4" value="{{ exp.ref_name | default('') }}">
+
+            <label class="block font-semibold mb-1">Contact de la référence :</label>
+            <input type="text" name="ref_contact[]" placeholder="Email ou téléphone" class="w-full border rounded p-2" value="{{ exp.ref_contact | default('') }}">
         </div>
-    </div>
+        {% endfor %}
+        </div>
 
-    <button type="button" onclick="addExperience()">➕ Ajouter une expérience</button>
-    <br><br>
-    <button type="submit">Suivant ➡️</button>
-</form>
+
+        <!-- Boutons -->
+        <div class="flex flex-col md:flex-row justify-between items-center mt-8 space-y-4 md:space-y-0">
+          <button type="button" onclick="addExperience()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+            ➕ Ajouter une expérience
+          </button>
+          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow">
+            Suivant ⏩
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
 
 <script>
 let expCount = 1;
 
 function addExperience() {
-    const div = document.createElement('div');
-    div.className = 'experienceEntry';
-    div.innerHTML = `
-        <label>Poste :</label><br>
-        <input type="text" name="title[]"><br><br>
+  const div = document.createElement('div');
+  div.className = 'experienceEntry border border-gray-300 p-6 rounded bg-gray-50 mt-6';
+  div.innerHTML = `
+    <label class="block font-semibold mb-1">Poste :</label>
+    <input type="text" name="title[]" class="w-full border rounded p-2 mb-4">
 
-        <label>Entreprise :</label><br>
-        <input type="text" name="company[]"><br><br>
+    <label class="block font-semibold mb-1">Entreprise :</label>
+    <input type="text" name="company[]" class="w-full border rounded p-2 mb-4">
 
-        <label>Ville / Pays :</label><br>
-        <input type="text" name="location[]"><br><br>
+    <label class="block font-semibold mb-1">Ville / Pays :</label>
+    <input type="text" name="location[]" class="w-full border rounded p-2 mb-4">
 
-        <label>Type de contrat :</label><br>
-        <select name="type[]">
-            <option value="">-- Sélectionner --</option>
-            <option>CDI</option>
-            <option>CDD</option>
-            <option>Stage</option>
-            <option>Freelance</option>
-            <option>Prestation</option>
-            <option>Autre</option>
-        </select><br><br>
+    <label class="block font-semibold mb-1">Type de contrat :</label>
+    <select name="type[]" class="w-full border rounded p-2 mb-4">
+      <option value="">-- Sélectionner --</option>
+      <option>CDI</option>
+      <option>CDD</option>
+      <option>Stage</option>
+      <option>Freelance</option>
+      <option>Prestation</option>
+      <option>Autre</option>
+    </select>
 
-        <label>Date de début :</label><br>
-        <input type="text" name="start_date[]" placeholder="MM/YYYY"><br><br>
+    <label class="block font-semibold mb-1">Date de début :</label>
+    <input type="text" name="start_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4">
 
-        <label>Date de fin :</label><br>
-        <input type="text" name="end_date[]" placeholder="MM/YYYY"><br><br>
+    <label class="block font-semibold mb-1">Date de fin :</label>
+    <input type="text" name="end_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4">
 
-        <label>Actuellement en poste :</label>
-        <input type="checkbox" name="current[]"><br><br>
+    <div class="flex items-center mb-4">
+      <input type="checkbox" name="current[]" class="mr-2">
+      <label class="font-medium">Actuellement en poste</label>
+    </div>
 
-        <label>Description des missions :</label><br>
-        <textarea name="description[]" rows="3" cols="50" placeholder="Décrivez vos responsabilités..."></textarea><br><br>
+    <label class="block font-semibold mb-1">Description des missions :</label>
+    <textarea name="description[]" rows="4" class="w-full border rounded p-2 mb-4" placeholder="- Analyse des KPI...&#10;- Développement de modèles prédictifs..."></textarea>
 
-        <label>Personne de référence :</label><br>
-        <input type="text" name="ref_name[]" placeholder="Nom de la personne"><br><br>
+    <label class="block font-semibold mb-1">Personne de référence :</label>
+    <input type="text" name="ref_name[]" placeholder="Nom de la personne" class="w-full border rounded p-2 mb-4">
 
-        <label>Contact de la référence :</label><br>
-        <input type="text" name="ref_contact[]" placeholder="Email ou téléphone"><br><br>
-
-        <hr>
-    `;
-    document.getElementById('experienceFields').appendChild(div);
-    expCount++;
+    <label class="block font-semibold mb-1">Contact de la référence :</label>
+    <input type="text" name="ref_contact[]" placeholder="Email ou téléphone" class="w-full border rounded p-2">
+  `;
+  document.getElementById('experienceFields').appendChild(div);
 }
 </script>
-{% endblock %}
+
+</body>
+</html>
