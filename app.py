@@ -116,7 +116,6 @@ def step2():
         'degree': str, 'school': str, 'location': str, 
         'start_year': str, 'end_year': str, 'in_progress': bool,
         'thesis_subject': str, 'thesis_supervisors': str
-        # Nous avons supprimé 'courses': str de cette liste !
     }
     if request.method == 'POST':
         education_list = save_list_data(fields)
@@ -142,6 +141,10 @@ def step2():
         session['education'] = education_list
         session.modified = True
         return redirect(url_for(STEP_REDIRECTS['step2']))
+    
+    # 🎯 CORRECTION: Ajout du return pour la méthode GET
+    return render_template('form_step2.html', education=session.get('education', []))
+
         
 @app.route('/step3', methods=['GET', 'POST'])
 def step3():
