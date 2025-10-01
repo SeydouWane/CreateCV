@@ -38,6 +38,8 @@ def save_single_entry_data(fields_list):
         data[field] = request.form.get(field)
     return data
 
+# Fichier app.py, fonction save_list_data (CORRIGÉE)
+
 def save_list_data(fields_map):
     """Sauvegarde des données de listes dynamiques (expériences, formations, etc.)."""
     
@@ -47,7 +49,7 @@ def save_list_data(fields_map):
         # Pour les listes dynamiques, Flask nomme les champs "field[]"
         form_data[field] = request.form.getlist(field + '[]')
 
-    # 2. Déterminer la longueur de la liste (basé sur le premier champ)
+    # 2. Déterminer la longueur de la liste (basé sur le premier champ, le plus fiable)
     first_field = list(fields_map.keys())[0]
     if not form_data or not form_data.get(first_field):
         return []
@@ -70,11 +72,21 @@ def save_list_data(fields_map):
             
         entry = {}
         for field, type_conversion in fields_map.items():
-            if type_conversion == bool:
-                # Vérifie si l'index 'i' est dans la liste des index cochés pour ce champ
+            
+            # 🚨 LIGNE DE SÉCURITÉ AJOUTÉE : Vérifie que la liste existe et que l'index 'i' est valide.
+            if i >= len(form_data.get(field, [])):
+                 # Si le champ manque pour cet index, on passe ou on met une valeur par défaut.
+                 # Pour les champs non-booléens, on met une chaîne vide.
+                 value = '' 
+            elif type_conversion == bool:
+                # La logique pour les booléens ne change pas car elle utilise checked_fields,
+                # mais le champ 'field' est utilisé pour construire checked_fields
                 entry[field] = str(i) in checked_fields[field]
+                continue # Passer à la prochaine itération de la boucle interne
             else:
-                entry[field] = form_data[field][i]
+                value = form_data[field][i]
+                
+            entry[field] = value
         
         data_list.append(entry)
         
