@@ -188,7 +188,7 @@
             <h3>{{ edu.degree }} <span style="color: var(--accent-color);">@ {{ edu.school }}</span></h3>
             <p class="meta">{{ edu.start_year }} {% if edu.in_progress %}– En cours{% else %}– {{ edu.end_year }}{% endif %}</p>
             
-            {% if edu.courses | select('length') | list %}
+            {% if edu.courses | select('string') | list %}
             <p style="font-size: 9pt; margin-top: 5px;">Matières principales : {{ edu.courses | join(', ') }}</p>
             {% endif %}
             
