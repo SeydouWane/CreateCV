@@ -111,28 +111,38 @@ def step1a():
 
 @app.route('/step2', methods=['GET', 'POST'])
 def step2():
-    """Formations."""
+    """Formations (Liste dynamique)."""
     fields = {
         'degree': str, 'school': str, 'location': str, 
         'start_year': str, 'end_year': str, 'in_progress': bool,
-        'thesis_subject': str, 'thesis_supervisors': str, 'courses': str
+        'thesis_subject': str, 'thesis_supervisors': str
+        # Nous avons supprimé 'courses': str de cette liste !
     }
     if request.method == 'POST':
         education_list = save_list_data(fields)
         
-        # Traitement des cours (conversion de la chaîne multiligne en liste)
-        for entry in education_list:
-            if 'courses' in entry and entry['courses']:
-                entry['courses'] = [c.strip() for c in entry['courses'].split('\n') if c.strip()]
-            else:
-                entry['courses'] = []
+        # Récupération manuelle des 4 cours, post-fusion
+        courses1 = request.form.getlist('course1[]')
+        courses2 = request.form.getlist('course2[]')
+        courses3 = request.form.getlist('course3[]')
+        courses4 = request.form.getlist('course4[]')
+
+        # Traiter les cours et les ajouter à chaque entrée
+        for i, entry in enumerate(education_list):
+            entry['courses'] = []
+            if i < len(courses1) and courses1[i].strip():
+                entry['courses'].append(courses1[i].strip())
+            if i < len(courses2) and courses2[i].strip():
+                entry['courses'].append(courses2[i].strip())
+            if i < len(courses3) and courses3[i].strip():
+                entry['courses'].append(courses3[i].strip())
+            if i < len(courses4) and courses4[i].strip():
+                entry['courses'].append(courses4[i].strip())
                 
         session['education'] = education_list
         session.modified = True
         return redirect(url_for(STEP_REDIRECTS['step2']))
-
-    return render_template('form_step2.html', education=session.get('education', []))
-
+        
 @app.route('/step3', methods=['GET', 'POST'])
 def step3():
     """Compétences."""
