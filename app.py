@@ -4,20 +4,18 @@ import os
 import io
 
 # --- 🚨 DÉPENDANCE WEASYPRINT ---
-# Nous utilisons WeasyPrint pour générer le PDF. 
-# Si vous ne l'avez pas encore installé: pip install weasyprint
+# Assurez-vous d'avoir installé 'weasyprint' (et ses dépendances GTK si sur macOS/Linux).
 try:
     from weasyprint import HTML
 except ImportError:
-    print("ATTENTION: La librairie 'weasyprint' n'est pas installée. Le CV sera renvoyé en HTML brut.")
-    # On définit une fonction de substitution si WeasyPrint manque
-    def generate_pdf_substitute(html_content):
-        return io.BytesIO(html_content.encode('utf-8'))
-
+    # Cette fonction de substitution est utilisée si WeasyPrint n'est pas trouvé
+    print("ATTENTION: La librairie 'weasyprint' n'est pas installée. Le CV sera renvoyé en HTML brut (mode débogage).")
+    HTML = None # Simule l'absence de la classe HTML
 
 app = Flask(__name__)
 # 🚨 IMPORTANT : CLÉ SECRÈTE OBLIGATOIRE POUR LES SESSIONS FLASK
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'default_secret_key_a_changer_en_production_98765') 
+# Utilisez une variable d'environnement ou une clé forte !
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_tres_solide_pour_la_session_flask_987654321') 
 
 # Définition des chemins de redirection pour la navigation
 STEP_REDIRECTS = {
@@ -139,7 +137,6 @@ def step2():
 def step3():
     """Compétences."""
     if request.method == 'POST':
-        # Les compétences sont un cas spécial : une liste de chaînes simples
         skills_list = [skill.strip() for skill in request.form.getlist('skills[]') if skill.strip()]
         session['skills'] = skills_list
         session.modified = True
@@ -188,10 +185,9 @@ def step6():
 def template_select():
     """Choix du Template."""
     if request.method == 'POST':
-        # Sauvegarde le choix du template, par défaut à 'classic'
         session['template_choice'] = request.form.get('template_choice', 'classic')
         session.modified = True
-        return redirect(url_for(STEP_REDIRECTS['template_select'])) # Redirection vers 'review'
+        return redirect(url_for(STEP_REDIRECTS['template_select']))
     
     return render_template('form_template_select.html', 
                            template_choice=session.get('template_choice', 'classic'))
@@ -200,7 +196,6 @@ def template_select():
 @app.route('/review')
 def review():
     """Revue finale avant génération."""
-    # Assurer qu'il y a des données minimales pour éviter une erreur
     if not session.get('personal_info'):
         return redirect(url_for('step1'))
         
@@ -211,13 +206,12 @@ def review():
 @app.route('/generate_cv')
 def generate_cv():
     """
-    Génère le CV final en PDF en utilisant le template choisi dans la session.
+    Génère le CV final en PDF en utilisant le template choisi.
     """
     # 1. Déterminer le template à utiliser (par défaut: classic)
     template_choice = session.get('template_choice', 'classic')
     template_name = f'cv_templates_{template_choice}.html'
 
-    # Si l'utilisateur n'a pas rempli le formulaire step1, on le renvoie
     if not session.get('personal_info'):
         return redirect(url_for('step1'))
 
@@ -227,17 +221,26 @@ def generate_cv():
                                today=datetime.now().strftime('%d/%m/%Y'))
 
     # 3. Conversion en PDF
-    try:
-        # Tente d'utiliser WeasyPrint
-        pdf_bytes = HTML(string=html_out, base_url=request.base_url).write_pdf()
-        pdf_file = io.BytesIO(pdf_bytes)
-    except NameError:
-        # Si WeasyPrint n'a pas pu être importé (non installé)
-        # Pour le débogage, on renvoie le HTML brut
+    if HTML: # Vérifie si WeasyPrint a été importé
+        try:
+            # 🚨 CORRECTION CRUCIALE DU CONSTRUCTEUR PDF 🚨
+            # On utilise request.url_root comme base_url pour que WeasyPrint puisse trouver les images/CSS
+            html_object = HTML(string=html_out, base_url=request.url_root)
+            
+            # Appel de la méthode write_pdf() sans arguments supplémentaires
+            pdf_bytes = html_object.write_pdf()
+            
+            pdf_file = io.BytesIO(pdf_bytes)
+
+        except Exception as e:
+            app.logger.error(f"Erreur de conversion PDF : {e}")
+            # Si la conversion PDF échoue, on affiche le HTML brut pour le débogage
+            return html_out, 200, {'Content-Type': 'text/html'}
+    
+    else:
+        # Si WeasyPrint n'a pas pu être importé du tout
         return html_out, 200, {'Content-Type': 'text/html'}
-    except Exception as e:
-        app.logger.error(f"Erreur de conversion PDF : {e}")
-        return f"Erreur lors de la conversion PDF : {e}", 500
+
 
     # 4. Envoi du fichier PDF
     name = session.get('personal_info', {}).get('name', 'CV_Anonyme').replace(' ', '_')
@@ -250,6 +253,4 @@ def generate_cv():
     )
 
 if __name__ == '__main__':
-    # Le mode debug doit être désactivé en production
-    # Si debug=True, les changements de session sont persistants (utile pour le développement)
     app.run(host='0.0.0.0', port=5000, debug=True)
