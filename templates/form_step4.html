@@ -1,143 +1,248 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Étape 4 : Expériences professionnelles</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+{% extends "base.html" %}
 
-<div class="flex min-h-screen">
+{% block title %}Étape 4 - Expériences Professionnelles{% endblock %}
 
-  <!-- Sidebar -->
-  <aside class="w-72 bg-white shadow-lg p-6 border-r">
-    <h2 class="text-xl font-bold text-gray-800 mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-base font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="text-blue-600 font-bold">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block content %}
+    <div class="w-full max-w-4xl mx-auto space-y-8">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">🏢</span> Étape 4 : Expériences Professionnelles
+      </h1>
+      
+      <p class="text-gray-600 text-center">Détaillez vos postes et missions, du plus récent au plus ancien, en mettant l'accent sur les réalisations quantifiables.</p>
 
-  <!-- Contenu principal -->
-  <main class="flex-1 p-10">
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">🏢 Étape 4 : Expériences professionnelles</h1>
-
-      <form method="POST" id="experienceForm">
-        <div id="experienceFields" class="space-y-6">
+      <form method="POST" id="experienceForm" class="space-y-6">
+        
+        <div id="experienceFields" class="space-y-8">
         {% for exp in experiences %}
-        <div class="experienceEntry border border-gray-300 p-6 rounded bg-gray-50">
-            <label class="block font-semibold mb-1">Poste :</label>
-            <input type="text" name="title[]" class="w-full border rounded p-2 mb-4" value="{{ exp.title | default('') }}">
+            {% set index = loop.index0 %}
+            {% set is_current = exp.current | default(false) %}
+            <div class="experienceEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
 
-            <label class="block font-semibold mb-1">Entreprise :</label>
-            <input type="text" name="company[]" class="w-full border rounded p-2 mb-4" value="{{ exp.company | default('') }}">
+                {% if loop.length > 1 %}
+                <button type="button" onclick="removeExperience(this)" class="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10" aria-label="Supprimer cette expérience">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+                {% endif %}
 
-            <label class="block font-semibold mb-1">Ville / Pays :</label>
-            <input type="text" name="location[]" class="w-full border rounded p-2 mb-4" value="{{ exp.location | default('') }}">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Titre du poste :</label>
+                        <input type="text" name="title[]" value="{{ exp.title | default('') }}" placeholder="Ex: Développeur Front-end" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
 
-            <label class="block font-semibold mb-1">Type de contrat :</label>
-            <select name="type[]" class="w-full border rounded p-2 mb-4">
-            <option value="">-- Sélectionner --</option>
-            {% for option in ['CDI','CDD','Stage','Freelance','Prestation','Autre'] %}
-                <option value="{{ option }}" {% if exp.type == option %}selected{% endif %}>{{ option }}</option>
-            {% endfor %}
-            </select>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Entreprise :</label>
+                        <input type="text" name="company[]" value="{{ exp.company | default('') }}" placeholder="Ex: Google" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
 
-            <label class="block font-semibold mb-1">Date de début :</label>
-            <input type="text" name="start_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4" value="{{ exp.start_date | default('') }}">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Lieu :</label>
+                        <input type="text" name="location[]" value="{{ exp.location | default('') }}" placeholder="Ex: Paris, France" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Type :</label>
+                        <select name="type[]" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="CDI" {% if exp.type == 'CDI' %}selected{% endif %}>CDI</option>
+                            <option value="CDD" {% if exp.type == 'CDD' %}selected{% endif %}>CDD</option>
+                            <option value="Stage" {% if exp.type == 'Stage' %}selected{% endif %}>Stage</option>
+                            <option value="Freelance" {% if exp.type == 'Freelance' %}selected{% endif %}>Freelance</option>
+                            <option value="Autre" {% if exp.type == 'Autre' %}selected{% endif %}>Autre</option>
+                        </select>
+                    </div>
+                </div>
 
-            <label class="block font-semibold mb-1">Date de fin :</label>
-            <input type="text" name="end_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4" value="{{ exp.end_date | default('') }}">
+                <div class="grid grid-cols-3 gap-4 mb-4 items-end">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Date de début :</label>
+                        <input type="month" name="start_date[]" value="{{ exp.start_date | default('') }}" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
 
-            <div class="flex items-center mb-4">
-            <input type="checkbox" name="current[]" class="mr-2" value="{{ loop.index0 }}" {% if exp.current %}checked{% endif %}>
-            <label class="font-medium">Actuellement en poste</label>
+                    <div class="end-date-field" style="display: {% if is_current %}none{% else %}block{% endif %};">
+                        <label class="font-semibold block mb-1 text-gray-700">Date de fin :</label>
+                        <input type="month" name="end_date[]" value="{{ exp.end_date | default('') }}" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" name="current[]" value="{{ index }}" onchange="toggleEndDate(this)" {% if is_current %}checked{% endif %} class="form-checkbox text-blue-600 rounded">
+                        <label class="ml-2 font-medium text-gray-700">Actuellement en poste</label>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="font-semibold block mb-1 text-gray-700">Description du poste (utiliser des tirets pour les points clés) :</label>
+                    <textarea name="description[]" rows="4" placeholder="- Responsabilité A: Réalisation B (résultat C)&#10;- Responsabilité D: Réalisation E (résultat F)" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">{{ exp.description | default('') }}</textarea>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label class="font-medium block mb-1 text-gray-700">Nom du Référent (optionnel) :</label>
+                        <input type="text" name="ref_name[]" value="{{ exp.ref_name | default('') }}" placeholder="Nom, Titre" class="w-full border p-2 rounded-lg">
+                    </div>
+                    
+                    <div>
+                        <label class="font-medium block mb-1 text-gray-700">Contact du Référent (optionnel) :</label>
+                        <input type="text" name="ref_contact[]" value="{{ exp.ref_contact | default('') }}" placeholder="Email ou Téléphone" class="w-full border p-2 rounded-lg">
+                    </div>
+                </div>
             </div>
-
-            <label class="block font-semibold mb-1">Description des missions :</label>
-            <textarea name="description[]" rows="4" class="w-full border rounded p-2 mb-4" placeholder="- Exemple...">{{ exp.description | default('') }}</textarea>
-
-            <label class="block font-semibold mb-1">Personne de référence :</label>
-            <input type="text" name="ref_name[]" placeholder="Nom de la personne" class="w-full border rounded p-2 mb-4" value="{{ exp.ref_name | default('') }}">
-
-            <label class="block font-semibold mb-1">Contact de la référence :</label>
-            <input type="text" name="ref_contact[]" placeholder="Email ou téléphone" class="w-full border rounded p-2" value="{{ exp.ref_contact | default('') }}">
-        </div>
         {% endfor %}
+
+        {% if not experiences %}
+            <div class="experienceEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div><label class="font-semibold block mb-1 text-gray-700">Titre du poste :</label><input type="text" name="title[]" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
+                    <div><label class="font-semibold block mb-1 text-gray-700">Entreprise :</label><input type="text" name="company[]" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
+                    <div><label class="font-semibold block mb-1 text-gray-700">Lieu :</label><input type="text" name="location[]" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
+                    <div><label class="font-semibold block mb-1 text-gray-700">Type :</label><select name="type[]" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"><option value="CDI">CDI</option><option value="CDD">CDD</option><option value="Stage">Stage</option><option value="Freelance">Freelance</option><option value="Autre">Autre</option></select></div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mb-4 items-end">
+                    <div><label class="font-semibold block mb-1 text-gray-700">Date de début :</label><input type="month" name="start_date[]" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
+                    <div class="end-date-field">
+                        <label class="font-semibold block mb-1 text-gray-700">Date de fin :</label>
+                        <input type="month" name="end_date[]" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="current[]" value="0" onchange="toggleEndDate(this)" class="form-checkbox text-blue-600 rounded">
+                        <label class="ml-2 font-medium text-gray-700">Actuellement en poste</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1 text-gray-700">Description du poste :</label>
+                    <textarea name="description[]" rows="4" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div><label class="font-medium block mb-1 text-gray-700">Nom du Référent :</label><input type="text" name="ref_name[]" class="w-full border p-2 rounded-lg"></div>
+                    <div><label class="font-medium block mb-1 text-gray-700">Contact du Référent :</label><input type="text" name="ref_contact[]" class="w-full border p-2 rounded-lg"></div>
+                </div>
+            </div>
+        {% endif %}
         </div>
 
+        <button type="button" onclick="addExperience()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-md font-medium">
+          ➕ Ajouter une expérience
+        </button>
 
-        <!-- Boutons -->
-        <div class="flex flex-col md:flex-row justify-between items-center mt-8 space-y-4 md:space-y-0">
-          <button type="button" onclick="addExperience()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
-            ➕ Ajouter une expérience
-          </button>
-          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow">
+        <div class="mt-6 border-t pt-6">
+          <button type="submit" class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
             Suivant ⏩
           </button>
         </div>
       </form>
     </div>
-  </main>
-</div>
 
 <script>
-let expCount = 1;
+// Initialiser le compteur en se basant sur la liste existante ou 1 si la liste est vide.
+let expCount = {{ experiences | length if experiences else 1 }};
 
-function addExperience() {
-  const div = document.createElement('div');
-  div.className = 'experienceEntry border border-gray-300 p-6 rounded bg-gray-50 mt-6';
-  div.innerHTML = `
-    <label class="block font-semibold mb-1">Poste :</label>
-    <input type="text" name="title[]" class="w-full border rounded p-2 mb-4">
-
-    <label class="block font-semibold mb-1">Entreprise :</label>
-    <input type="text" name="company[]" class="w-full border rounded p-2 mb-4">
-
-    <label class="block font-semibold mb-1">Ville / Pays :</label>
-    <input type="text" name="location[]" class="w-full border rounded p-2 mb-4">
-
-    <label class="block font-semibold mb-1">Type de contrat :</label>
-    <select name="type[]" class="w-full border rounded p-2 mb-4">
-      <option value="">-- Sélectionner --</option>
-      <option>CDI</option>
-      <option>CDD</option>
-      <option>Stage</option>
-      <option>Freelance</option>
-      <option>Prestation</option>
-      <option>Autre</option>
-    </select>
-
-    <label class="block font-semibold mb-1">Date de début :</label>
-    <input type="text" name="start_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4">
-
-    <label class="block font-semibold mb-1">Date de fin :</label>
-    <input type="text" name="end_date[]" placeholder="MM/YYYY" class="w-full border rounded p-2 mb-4">
-
-    <div class="flex items-center mb-4">
-      <input type="checkbox" name="current[]" class="mr-2">
-      <label class="font-medium">Actuellement en poste</label>
-    </div>
-
-    <label class="block font-semibold mb-1">Description des missions :</label>
-    <textarea name="description[]" rows="4" class="w-full border rounded p-2 mb-4" placeholder="- Analyse des KPI...&#10;- Développement de modèles prédictifs..."></textarea>
-
-    <label class="block font-semibold mb-1">Personne de référence :</label>
-    <input type="text" name="ref_name[]" placeholder="Nom de la personne" class="w-full border rounded p-2 mb-4">
-
-    <label class="block font-semibold mb-1">Contact de la référence :</label>
-    <input type="text" name="ref_contact[]" placeholder="Email ou téléphone" class="w-full border rounded p-2">
-  `;
-  document.getElementById('experienceFields').appendChild(div);
+/**
+ * Gère l'affichage du champ "Date de fin" selon que "Actuellement en poste" est coché.
+ * @param {HTMLInputElement} checkbox - La case à cocher "Actuellement en poste".
+ */
+function toggleEndDate(checkbox) {
+    const entry = checkbox.closest('.experienceEntry');
+    const endDateField = entry.querySelector('.end-date-field');
+    
+    if (checkbox.checked) {
+        endDateField.style.display = 'none';
+        // Vider la date de fin pour ne pas envoyer de valeur incohérente
+        endDateField.querySelector('input[name="end_date[]"]').value = '';
+    } else {
+        endDateField.style.display = 'block';
+    }
 }
-</script>
 
-</body>
-</html>
+/**
+ * Ajoute une nouvelle entrée d'expérience vide.
+ */
+function addExperience() {
+  const container = document.getElementById('experienceFields');
+  const baseEntry = container.querySelector('.experienceEntry'); 
+  
+  if (!baseEntry) return;
+
+  const clone = baseEntry.cloneNode(true);
+  
+  // 1. Réinitialiser les valeurs des inputs et textareas
+  clone.querySelectorAll('input, textarea').forEach(input => {
+    if (input.type === 'checkbox') {
+        input.checked = false;
+        
+        // 🚨 IMPORTANT : Mettre à jour la valeur de 'current' avec le nouvel index
+        if (input.name === 'current[]') {
+            input.value = expCount;
+        }
+        
+    } else {
+        input.value = '';
+    }
+  });
+
+  // 2. Afficher la Date de fin (par défaut non coché)
+  const endDateField = clone.querySelector('.end-date-field');
+  if (endDateField) {
+      endDateField.style.display = 'block';
+  }
+  
+  // 3. Rendre visible le bouton de suppression sur le clone (s'il n'existait pas)
+  let removeBtn = clone.querySelector('button[onclick="removeExperience(this)"]');
+  if (!removeBtn) {
+      removeBtn = document.createElement('button');
+      removeBtn.setAttribute('type', 'button');
+      removeBtn.setAttribute('onclick', 'removeExperience(this)');
+      removeBtn.className = 'absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10';
+      removeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+      clone.prepend(removeBtn);
+  } else {
+      removeBtn.style.display = 'block';
+  }
+  
+  container.appendChild(clone);
+  expCount++; // Incrémenter pour le prochain ajout
+  toggleRemoveButtons();
+}
+
+/**
+ * Supprime l'entrée d'expérience associée au bouton cliqué.
+ * @param {HTMLButtonElement} button - Le bouton de suppression.
+ */
+function removeExperience(button) {
+  const entry = button.closest('.experienceEntry');
+  if (entry) {
+    entry.remove();
+    // OPTIONNEL : Mise à jour de expCount peut être complexe ici, 
+    // on compte sur Flask pour ignorer les index manquants.
+    toggleRemoveButtons();
+  }
+}
+
+/**
+ * Gère l'affichage des boutons de suppression.
+ */
+function toggleRemoveButtons() {
+    const entries = document.querySelectorAll('.experienceEntry');
+    const removeButtons = document.querySelectorAll('.experienceEntry button[onclick="removeExperience(this)"]');
+    
+    if (entries.length <= 1) {
+        removeButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        removeButtons.forEach(btn => btn.style.display = 'block');
+    }
+}
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+    // S'assurer que les boutons de suppression sont bien gérés
+    toggleRemoveButtons();
+    
+    // Gérer l'état des champs de date de fin pour les entrées existantes
+    document.querySelectorAll('.experienceEntry').forEach(entry => {
+        const currentCheckbox = entry.querySelector('input[name="current[]"]');
+        if (currentCheckbox && currentCheckbox.checked) {
+            toggleEndDate(currentCheckbox);
+        }
+    });
+});
+</script>
+{% endblock %}

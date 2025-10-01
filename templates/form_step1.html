@@ -1,99 +1,88 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Étape 1 - Informations Personnelles</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex">
+{% extends "base.html" %}
 
-  <!-- Sidebar -->
-  <aside class="w-72 bg-white shadow-md p-6 border-r h-screen">
-    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-base font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600 {% if request.path == '/step1' %}text-blue-600 font-bold{% endif %}">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600 {% if request.path == '/step1a' %}text-blue-600 font-bold{% endif %}">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block title %}Étape 1 - Informations Personnelles{% endblock %}
 
+{% block content %}
+    <div class="w-full max-w-3xl mx-auto space-y-8">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">🟦</span> Étape 1 : Informations Personnelles
+      </h1>
 
-  <!-- Main Content -->
-  <main class="flex-1 flex items-center justify-center px-6 py-10">
-    <div class="bg-white w-full max-w-2xl p-10 rounded-lg shadow space-y-6">
-      <h1 class="text-3xl font-bold text-gray-800 text-center border-b pb-4">Étape 1 : Informations Personnelles</h1>
+      <form method="POST" enctype="multipart/form-data" class="space-y-6">
 
-      <form method="POST" enctype="multipart/form-data" class="space-y-5">
-        <!-- Nom -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">NOM et Prenom :</label>
-          <input type="text" name="name" value="{{ personal_info.get('name', '') }}"
-                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Coordonnées</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">NOM et Prenom <span class="text-red-500">*</span> :</label>
+                    <input type="text" name="name" value="{{ personal_info.get('name', '') }}" required
+                           class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span> :</label>
+                    <input type="email" name="email" value="{{ personal_info.get('email', '') }}" required
+                           class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Téléphone <span class="text-red-500">*</span> :</label>
+                    <input type="text" name="phone" value="{{ personal_info.get('phone', '') }}" required
+                           class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Lieu de résidence (Ville, Pays) :</label>
+                    <input type="text" name="location" value="{{ personal_info.get('location', '') }}"
+                           class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Photo professionnelle (optionnelle) :</label>
+                    {% if personal_info.get('photo_filename') %}
+                        <p class="text-xs text-green-600 mb-2">Photo actuelle : **{{ personal_info.get('photo_filename') }}**</p>
+                    {% endif %}
+                    <input type="file" name="photo"
+                           class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Réseaux & Titre</h2>
+            <div class="space-y-5">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Titre professionnel (optionnel) :</label>
+                    <input type="text" name="title" value="{{ personal_info.get('title', '') }}"
+                           placeholder="Ex: Développeur Full Stack Senior"
+                           class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Lien LinkedIn (URL complète) :</label>
+                    <input type="url" name="linkedin" value="{{ personal_info.get('linkedin', '') }}"
+                           placeholder="https://www.linkedin.com/in/..."
+                           class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Site web personnel ou Portfolio (optionnel) :</label>
+                    <input type="url" name="website" value="{{ personal_info.get('website', '') }}"
+                           placeholder="https://mon-portfolio.com"
+                           class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                </div>
+            </div>
         </div>
 
-        <!-- Email -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Email :</label>
-          <input type="email" name="email" value="{{ personal_info.get('email', '') }}"
-                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <!-- Téléphone -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Téléphone :</label>
-          <input type="text" name="phone" value="{{ personal_info.get('phone', '') }}"
-                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <!-- Résidence -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Lieu de résidence :</label>
-          <input type="text" name="location" value="{{ personal_info.get('location', '') }}"
-                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <!-- Titre -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Titre professionnel (optionnel) :</label>
-          <input type="text" name="title" value="{{ personal_info.get('title', '') }}"
-                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <!-- LinkedIn -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Lien LinkedIn :</label>
-          <input type="text" name="linkedin" value="{{ personal_info.get('linkedin', '') }}"
-                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <!-- Site Web -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Site web personnel (optionnel) :</label>
-          <input type="url" name="website" value="{{ personal_info.get('website', '') }}"
-                 class="mt-1 w-full border rounded-md px-4 py-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <!-- Photo -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Photo professionnelle (optionnelle) :</label>
-          <input type="file" name="photo"
-                 class="mt-1 w-full file:bg-indigo-50 file:border file:rounded-md file:px-4 file:py-1 file:text-indigo-700 text-sm">
-        </div>
-
-        <!-- Suivant -->
         <div class="pt-4">
           <button type="submit"
-                  class="w-full bg-indigo-600 text-white font-semibold py-2 rounded-md hover:bg-indigo-700 transition">
+                  class="w-full bg-indigo-600 text-white font-bold text-lg py-3 rounded-lg hover:bg-indigo-700 transition duration-150 shadow-md transform hover:scale-[1.005]">
             Suivant ➡️
           </button>
         </div>
       </form>
     </div>
-  </main>
-</body>
-</html>
+{% endblock %}

@@ -1,40 +1,30 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Étape 1A : Langues</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+{% extends "base.html" %}
 
-<div class="flex min-h-screen">
+{% block title %}Étape 1a - Langues{% endblock %}
 
-  <!-- SIDEBAR CLIQUABLE -->
-  <aside class="w-72 bg-white shadow-md p-6 border-r h-screen">
-    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-base font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600 {% if request.path == '/step1' %}text-blue-600 font-bold{% endif %}">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600 {% if request.path == '/step1a' %}text-blue-600 font-bold{% endif %}">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block content %}
+    <div class="w-full max-w-2xl mx-auto space-y-8">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">🌐</span> Étape 1A : Langues
+      </h1>
+      
+      <p class="text-gray-600 text-center">Indiquez les langues que vous maîtrisez ainsi que vos niveaux de compétence (parlé, lu, écrit).</p>
 
-  <!-- CONTENU PRINCIPAL -->
-  <main class="flex-1 p-10 overflow-y-auto">
-    <div class="max-w-2xl mx-auto bg-white rounded shadow p-8">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">Étape 1A : Langues</h1>
-
-      <form method="POST" id="languagesForm">
+      <form method="POST" id="languagesForm" class="space-y-6">
+        
         <div id="languagesFields" class="space-y-6">
           {% for lang in languages %}
-          <div class="languageEntry bg-gray-50 p-4 border rounded">
-            <label class="font-semibold block mb-1">Langue :</label>
-            <select name="language_name[]" class="w-full p-2 border rounded mb-3" required>
+          <div class="languageEntry bg-white p-6 rounded-lg border border-gray-200 shadow-sm relative">
+            
+            {% if loop.length > 1 %}
+            <button type="button" onclick="removeLanguage(this)" class="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+            {% endif %}
+
+            <label class="font-semibold block mb-2 text-gray-700">Langue :</label>
+            <select name="language_name[]" class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150" required>
               <option value="">-- Choisissez une langue --</option>
               {% set options = ['Français', 'Anglais', 'Espagnol', 'Arabe', 'Wolof', 'Peul', 'Allemand', 'Italien', 'Chinois', 'Portugais', 'Autre'] %}
               {% for opt in options %}
@@ -42,64 +32,170 @@
               {% endfor %}
             </select>
 
-            <label class="font-semibold block mb-1">Compétences :</label>
-            <div class="space-x-6">
-              <label><input type="checkbox" name="speak_{{ loop.index0 }}" {% if lang.speak %}checked{% endif %}> Parlé</label>
-              <label><input type="checkbox" name="read_{{ loop.index0 }}" {% if lang.read %}checked{% endif %}> Lu</label>
-              <label><input type="checkbox" name="write_{{ loop.index0 }}" {% if lang.write %}checked{% endif %}> Écrit</label>
+            <label class="font-semibold block mb-2 text-gray-700">Compétences :</label>
+            <div class="flex flex-wrap gap-x-8">
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="speak_{{ loop.index0 }}" {% if lang.speak %}checked{% endif %} class="form-checkbox text-blue-600 rounded">
+                <span class="ml-2 text-gray-700">Parlé</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="read_{{ loop.index0 }}" {% if lang.read %}checked{% endif %} class="form-checkbox text-blue-600 rounded">
+                <span class="ml-2 text-gray-700">Lu</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="write_{{ loop.index0 }}" {% if lang.write %}checked{% endif %} class="form-checkbox text-blue-600 rounded">
+                <span class="ml-2 text-gray-700">Écrit</span>
+              </label>
             </div>
           </div>
           {% endfor %}
+          
+          {% if not languages %}
+          <div class="languageEntry bg-white p-6 rounded-lg border border-gray-200 shadow-sm relative">
+            <label class="font-semibold block mb-2 text-gray-700">Langue :</label>
+            <select name="language_name[]" class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150" required>
+              <option value="">-- Choisissez une langue --</option>
+              {% set options = ['Français', 'Anglais', 'Espagnol', 'Arabe', 'Wolof', 'Peul', 'Allemand', 'Italien', 'Chinois', 'Portugais', 'Autre'] %}
+              {% for opt in options %}
+              <option value="{{ opt }}">{{ opt }}</option>
+              {% endfor %}
+            </select>
+            <label class="font-semibold block mb-2 text-gray-700">Compétences :</label>
+            <div class="flex flex-wrap gap-x-8">
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="speak_0" class="form-checkbox text-blue-600 rounded">
+                <span class="ml-2 text-gray-700">Parlé</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="read_0" class="form-checkbox text-blue-600 rounded">
+                <span class="ml-2 text-gray-700">Lu</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="write_0" class="form-checkbox text-blue-600 rounded">
+                <span class="ml-2 text-gray-700">Écrit</span>
+              </label>
+            </div>
+          </div>
+          {% endif %}
         </div>
 
-        <button type="button" onclick="addLanguage()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button type="button" onclick="addLanguage()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-md font-medium">
           + Ajouter une langue
         </button>
 
-        <div class="mt-6">
-          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+        <div class="mt-6 border-t pt-6">
+          <button type="submit" class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
             Suivant ⏩
           </button>
         </div>
       </form>
     </div>
-  </main>
-</div>
 
 <script>
-let languageCount = {{ languages | length if languages else 1 }};
+// IMPORTANT : Utiliser la longueur actuelle de la liste pour déterminer le prochain index unique.
+let languageCount = {{ languages | length if languages else 1 }}; // Commence à 1 si la liste était vide, sinon compte les éléments existants.
+
+// Assure que languageCount est au moins 1 si la liste était vide initialement
+if (languageCount === 0) {
+    // Si la boucle Jinja est vide, nous devons initialiser le compteur pour l'ajout
+    // en tenant compte de la première entrée vide que nous avons ajoutée en HTML statique.
+    languageCount = 1; 
+} else {
+    // Si la boucle n'est pas vide, le compteur est déjà le nombre d'éléments + 1
+    // (prêt pour le prochain index).
+    languageCount = {{ languages | length }};
+}
+
 
 function addLanguage() {
   const container = document.getElementById("languagesFields");
   const div = document.createElement("div");
-  div.className = "languageEntry bg-gray-50 p-4 border rounded mt-4";
+  
+  const currentIndex = languageCount; 
+  
+  div.className = "languageEntry bg-white p-6 rounded-lg border border-gray-200 shadow-sm mt-6 relative";
   div.innerHTML = `
-    <label class="font-semibold block mb-1">Langue :</label>
-    <select name="language_name[]" class="w-full p-2 border rounded mb-3" required>
+    <button type="button" onclick="removeLanguage(this)" class="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+    </button>
+
+    <label class="font-semibold block mb-2 text-gray-700">Langue :</label>
+    <select name="language_name[]" class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150" required>
       <option value="">-- Choisissez une langue --</option>
-      <option>Français</option>
-      <option>Anglais</option>
-      <option>Espagnol</option>
-      <option>Arabe</option>
-      <option>Wolof</option>
-      <option>Peul</option>
-      <option>Allemand</option>
-      <option>Italien</option>
-      <option>Chinois</option>
-      <option>Portugais</option>
-      <option>Autre</option>
+      <option value="Français">Français</option>
+      <option value="Anglais">Anglais</option>
+      <option value="Espagnol">Espagnol</option>
+      <option value="Arabe">Arabe</option>
+      <option value="Wolof">Wolof</option>
+      <option value="Peul">Peul</option>
+      <option value="Allemand">Allemand</option>
+      <option value="Italien">Italien</option>
+      <option value="Chinois">Chinois</option>
+      <option value="Portugais">Portugais</option>
+      <option value="Autre">Autre</option>
     </select>
-    <label class="font-semibold block mb-1">Compétences :</label>
-    <div class="space-x-6">
-      <label><input type="checkbox" name="speak_${languageCount}"> Parlé</label>
-      <label><input type="checkbox" name="read_${languageCount}"> Lu</label>
-      <label><input type="checkbox" name="write_${languageCount}"> Écrit</label>
+    
+    <label class="font-semibold block mb-2 text-gray-700">Compétences :</label>
+    <div class="flex flex-wrap gap-x-8">
+      <label class="inline-flex items-center">
+        <input type="checkbox" name="speak_${currentIndex}" class="form-checkbox text-blue-600 rounded">
+        <span class="ml-2 text-gray-700">Parlé</span>
+      </label>
+      <label class="inline-flex items-center">
+        <input type="checkbox" name="read_${currentIndex}" class="form-checkbox text-blue-600 rounded">
+        <span class="ml-2 text-gray-700">Lu</span>
+      </label>
+      <label class="inline-flex items-center">
+        <input type="checkbox" name="write_${currentIndex}" class="form-checkbox text-blue-600 rounded">
+        <span class="ml-2 text-gray-700">Écrit</span>
+      </label>
     </div>
   `;
   container.appendChild(div);
-  languageCount++;
+  languageCount++; // Incrémenter pour le prochain ajout
 }
-</script>
 
-</body>
-</html>
+
+/**
+ * Supprime l'entrée de langue associée au bouton cliqué.
+ * @param {HTMLButtonElement} button - Le bouton de suppression qui a été cliqué.
+ */
+function removeLanguage(button) {
+  const entry = button.closest('.languageEntry');
+  if (entry) {
+    entry.remove();
+    // OPTIONNEL : Vous pourriez ré-indexer les champs ici, mais
+    // pour les entrées dynamiques, il est souvent plus simple de laisser
+    // le back-end (Flask) ignorer les index manquants.
+  }
+}
+
+// Fonction pour masquer le bouton Supprimer si une seule entrée existe (optionnel)
+function toggleRemoveButtons() {
+    const entries = document.querySelectorAll('.languageEntry');
+    const removeButtons = document.querySelectorAll('.languageEntry button[onclick="removeLanguage(this)"]');
+    
+    // Si la page contient une seule entrée, on cache le bouton de suppression.
+    if (entries.length <= 1) {
+        removeButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        removeButtons.forEach(btn => btn.style.display = 'block');
+    }
+}
+
+// Assurez-vous d'appeler cette fonction au chargement et après l'ajout/suppression
+document.addEventListener('DOMContentLoaded', toggleRemoveButtons);
+
+const originalAddLanguage = addLanguage;
+addLanguage = function() {
+    originalAddLanguage();
+    toggleRemoveButtons();
+};
+
+const originalRemoveLanguage = removeLanguage;
+removeLanguage = function(button) {
+    originalRemoveLanguage(button);
+    toggleRemoveButtons();
+};
+</script>
+{% endblock %}

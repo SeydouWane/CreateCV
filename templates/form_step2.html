@@ -1,145 +1,266 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Étape 2 : Formations</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+{% extends "base.html" %}
 
-<div class="flex min-h-screen">
+{% block title %}Étape 2 - Formations{% endblock %}
 
-  <!-- Sidebar -->
-  <aside class="w-72 bg-white shadow-md p-6 border-r">
-    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-base font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="text-blue-600 font-bold">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block content %}
+    <div class="w-full max-w-4xl mx-auto space-y-8">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">🎓</span> Étape 2 : Formations
+      </h1>
+      
+      <p class="text-gray-600 text-center">Listez vos diplômes et certifications académiques, du plus récent au plus ancien.</p>
 
-  <!-- Main Content -->
-  <main class="flex-1 p-10">
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded shadow">
-      <h1 class="text-2xl font-bold mb-6 text-gray-800">Étape 2 : Formations</h1>
-
-      <form method="POST" id="educationForm">
+      <form method="POST" id="educationForm" class="space-y-6">
+        
         <div id="educationFields" class="space-y-6">
         {% for edu in education %}
-            <div class="educationEntry border p-4 rounded bg-gray-50">
+            <div class="educationEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
 
-            <label class="font-semibold">Diplôme :</label>
-            <input type="text" name="degree[]" value="{{ edu.degree | default('') }}" class="w-full border p-2 rounded mb-3">
+                {% if loop.length > 1 %}
+                <button type="button" onclick="removeEducation(this)" class="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10" aria-label="Supprimer cette formation">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+                {% endif %}
 
-            <label class="font-semibold">Établissement :</label>
-            <input type="text" name="school[]" value="{{ edu.school | default('') }}" class="w-full border p-2 rounded mb-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Diplôme :</label>
+                        <input type="text" name="degree[]" value="{{ edu.degree | default('') }}" placeholder="Ex: Master en Intelligence Artificielle" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
 
-            <div class="flex space-x-4">
-                <div class="flex-1">
-                <label class="font-semibold">Année de début :</label>
-                <input type="text" name="start_year[]" value="{{ edu.start_year | default('') }}" class="w-full border p-2 rounded mb-3">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Établissement :</label>
+                        <input type="text" name="school[]" value="{{ edu.school | default('') }}" placeholder="Ex: Université XYZ" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année de début :</label>
+                        <input type="text" name="start_year[]" value="{{ edu.start_year | default('') }}" placeholder="Ex: 2018" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année d'obtention :</label>
+                        <input type="text" name="end_year[]" value="{{ edu.end_year | default('') }}" placeholder="Ex: 2020" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
                 </div>
-                <div class="flex-1">
-                <label class="font-semibold">Année d'obtention :</label>
-                <input type="text" name="end_year[]" value="{{ edu.end_year | default('') }}" class="w-full border p-2 rounded mb-3">
+
+                <div class="flex items-center mt-4">
+                    <input type="checkbox" name="in_progress[]" value="{{ loop.index0 }}" {% if edu.in_progress %}checked{% endif %} class="form-checkbox text-blue-600 rounded">
+                    <label class="ml-2 font-medium text-gray-700">Formation en cours :</label>
+                </div>
+                
+                <hr class="my-4 border-gray-200">
+
+                <label class="font-semibold block mb-2 text-gray-700">Cours phares (jusqu'à 4) :</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    {% set courses = edu.courses or ['', '', '', ''] %}
+                    <input type="text" name="course1[]" value="{{ courses[0] }}" placeholder="Cours phare 1" class="border p-2 rounded-lg">
+                    <input type="text" name="course2[]" value="{{ courses[1] }}" placeholder="Cours phare 2" class="border p-2 rounded-lg">
+                    <input type="text" name="course3[]" value="{{ courses[2] }}" placeholder="Cours phare 3" class="border p-2 rounded-lg">
+                    <input type="text" name="course4[]" value="{{ courses[3] }}" placeholder="Cours phare 4" class="border p-2 rounded-lg">
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
+                    <label class="block font-semibold mb-2 text-gray-700">Mémoire / Thèse :</label>
+                    <div class="flex items-center mb-3">
+                        <input type="checkbox" class="has_thesis form-checkbox text-blue-600 rounded" onchange="toggleThesis(this)" {% if edu.thesis_subject or edu.thesis_supervisors %}checked{% endif %}>
+                        <label class="ml-2 font-medium">J'ai soutenu un mémoire pour ce diplôme</label>
+                    </div>
+
+                    <div class="thesis-section {% if not edu.thesis_subject and not edu.thesis_supervisors %}hidden{% endif %} space-y-3">
+                        <label class="font-medium text-gray-700">Sujet du mémoire :</label>
+                        <input type="text" name="thesis_subject[]" value="{{ edu.thesis_subject }}" placeholder="Titre de votre sujet" class="w-full border p-2 rounded-lg">
+
+                        <label class="font-medium text-gray-700">Nom(s) et contact(s) des encadreurs (optionnel) :</label>
+                        <input type="text" name="thesis_supervisors[]" value="{{ edu.thesis_supervisors }}" placeholder="Nom, Email" class="w-full border p-2 rounded-lg">
+                    </div>
                 </div>
             </div>
+        {% endfor %}
+        
+        {% if not education %}
+            <div class="educationEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Diplôme :</label>
+                        <input type="text" name="degree[]" placeholder="Ex: Licence en Informatique" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Établissement :</label>
+                        <input type="text" name="school[]" placeholder="Ex: École Supérieure" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année de début :</label>
+                        <input type="text" name="start_year[]" placeholder="Ex: 2021" required class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année d'obtention :</label>
+                        <input type="text" name="end_year[]" placeholder="Ex: 2024" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
 
-            <label class="block font-semibold mb-1">Formation en cours :</label>
-            <input type="checkbox" name="in_progress[]" {% if edu.in_progress %}checked{% endif %} class="mb-3">
+                <div class="flex items-center mt-4">
+                    <input type="checkbox" name="in_progress[]" value="0" class="form-checkbox text-blue-600 rounded">
+                    <label class="ml-2 font-medium text-gray-700">Formation en cours :</label>
+                </div>
+                
+                <hr class="my-4 border-gray-200">
 
-            <label class="font-semibold block">Cours phares :</label>
-            <div class="grid grid-cols-2 gap-4 mb-3">
-                {% set courses = edu.courses or ['', '', '', ''] %}
-                <input type="text" name="course1[]" value="{{ courses[0] }}" class="border p-2 rounded">
-                <input type="text" name="course2[]" value="{{ courses[1] }}" class="border p-2 rounded">
-                <input type="text" name="course3[]" value="{{ courses[2] }}" class="border p-2 rounded">
-                <input type="text" name="course4[]" value="{{ courses[3] }}" class="border p-2 rounded">
+                <label class="font-semibold block mb-2 text-gray-700">Cours phares (jusqu'à 4) :</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <input type="text" name="course1[]" placeholder="Cours phare 1" class="border p-2 rounded-lg">
+                    <input type="text" name="course2[]" placeholder="Cours phare 2" class="border p-2 rounded-lg">
+                    <input type="text" name="course3[]" placeholder="Cours phare 3" class="border p-2 rounded-lg">
+                    <input type="text" name="course4[]" placeholder="Cours phare 4" class="border p-2 rounded-lg">
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
+                    <label class="block font-semibold mb-2 text-gray-700">Mémoire / Thèse :</label>
+                    <div class="flex items-center mb-3">
+                        <input type="checkbox" class="has_thesis form-checkbox text-blue-600 rounded" onchange="toggleThesis(this)">
+                        <label class="ml-2 font-medium">J'ai soutenu un mémoire pour ce diplôme</label>
+                    </div>
+
+                    <div class="thesis-section hidden space-y-3">
+                        <label class="font-medium text-gray-700">Sujet du mémoire :</label>
+                        <input type="text" name="thesis_subject[]" placeholder="Titre de votre sujet" class="w-full border p-2 rounded-lg">
+
+                        <label class="font-medium text-gray-700">Nom(s) et contact(s) des encadreurs (optionnel) :</label>
+                        <input type="text" name="thesis_supervisors[]" placeholder="Nom, Email" class="w-full border p-2 rounded-lg">
+                    </div>
+                </div>
             </div>
+        {% endif %}
 
-            <label class="block font-semibold">Avez-vous soutenu un mémoire ?</label>
-            <input type="checkbox" class="has_thesis mb-3" onchange="toggleThesis(this)" {% if edu.thesis_subject or edu.thesis_supervisors %}checked{% endif %}>
+        </div>
 
-            <div class="thesis-section {% if not edu.thesis_subject and not edu.thesis_supervisors %}hidden{% endif %} mt-3">
-                <label class="font-semibold">Sujet du mémoire :</label>
-                <input type="text" name="thesis_subject[]" value="{{ edu.thesis_subject }}" class="w-full border p-2 rounded mb-3">
-
-                <label class="font-semibold">Nom(s) et email(s) des encadreurs :</label>
-                <input type="text" name="thesis_supervisors[]" value="{{ edu.thesis_supervisors }}" class="w-full border p-2 rounded">
-            </div>
-            </div>
-            {% endfor %}
-
-            </div>
-
-            <label class="block font-semibold mb-1">Formation en cours :</label>
-            <input type="checkbox" name="in_progress[]" class="mb-3">
-
-            <label class="font-semibold block">Cours phares :</label>
-            <div class="grid grid-cols-2 gap-4 mb-3">
-              <input type="text" name="course1[]" placeholder="Cours phare 1" class="border p-2 rounded">
-              <input type="text" name="course2[]" placeholder="Cours phare 2" class="border p-2 rounded">
-              <input type="text" name="course3[]" placeholder="Cours phare 3" class="border p-2 rounded">
-              <input type="text" name="course4[]" placeholder="Cours phare 4" class="border p-2 rounded">
-            </div>
-
-            <label class="block font-semibold">Avez-vous soutenu un mémoire ?</label>
-            <input type="checkbox" class="has_thesis mb-3" onchange="toggleThesis(this)">
-
-            <div class="thesis-section hidden mt-3">
-              <label class="font-semibold">Sujet du mémoire :</label>
-              <input type="text" name="thesis_subject[]" class="w-full border p-2 rounded mb-3">
-
-              <label class="font-semibold">Nom(s) et email(s) des encadreurs :</label>
-              <input type="text" name="thesis_supervisors[]" class="w-full border p-2 rounded">
-            </div>
-          </div>
-                <button type="button" onclick="addEducation()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button type="button" onclick="addEducation()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-md font-medium">
           ➕ Ajouter une formation
         </button>
 
-        <div class="mt-6">
-          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Suivant ⏩</button>
+        <div class="mt-6 border-t pt-6">
+          <button type="submit" class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
+            Suivant ⏩
+          </button>
         </div>
-        </div>
-
       </form>
     </div>
-  </main>
-</div>
 
 <script>
+// Initialiser le compteur de formations en se basant sur la liste existante ou 1 si la liste est vide (pour le premier index)
+let eduCount = {{ education | length if education else 1 }};
+
 function toggleThesis(checkbox) {
-  const thesisDiv = checkbox.closest('.educationEntry').querySelector('.thesis-section');
+  const educationEntry = checkbox.closest('.educationEntry');
+  // Le div du mémoire est encapsulé dans .thesis-section, il faut bien le cibler
+  const thesisDiv = educationEntry.querySelector('.thesis-section');
   if (thesisDiv) {
     thesisDiv.classList.toggle('hidden', !checkbox.checked);
+    
+    // Si on masque, on vide les champs pour ne pas envoyer de données inutiles
+    if (!checkbox.checked) {
+        thesisDiv.querySelectorAll('input').forEach(input => input.value = '');
+    }
   }
 }
 
+/**
+ * Ajoute une nouvelle entrée de formation vide.
+ */
 function addEducation() {
   const container = document.getElementById('educationFields');
-  const clone = container.firstElementChild.cloneNode(true);
+  
+  // Utiliser la dernière entrée comme modèle pour le clonage
+  // On trouve la dernière entrée valide, même si la liste Jinja était vide.
+  const baseEntry = container.querySelector('.educationEntry'); 
+  
+  if (!baseEntry) return; // Ne rien faire si la structure est absente
 
-  // Clear all input values
+  const clone = baseEntry.cloneNode(true);
+  
+  // 1. Réinitialiser les valeurs des inputs et des checkboxes
   clone.querySelectorAll('input').forEach(input => {
     if (input.type === 'checkbox') {
-      input.checked = false;
+        input.checked = false;
+        
+        // 🚨 IMPORTANT : Mettre à jour la valeur de 'in_progress' avec le nouvel index
+        if (input.name === 'in_progress[]') {
+            input.value = eduCount;
+        }
+        
     } else {
-      input.value = '';
+        input.value = '';
     }
   });
-
-  // Hide thesis section
-  clone.querySelector('.thesis-section').classList.add('hidden');
+  
+  // 2. Cacher la section Mémoire/Thèse et décocher la checkbox correspondante
+  const thesisCheckbox = clone.querySelector('.has_thesis');
+  if (thesisCheckbox) {
+      thesisCheckbox.checked = false;
+      const thesisDiv = clone.querySelector('.thesis-section');
+      if (thesisDiv) {
+          thesisDiv.classList.add('hidden');
+      }
+  }
+  
+  // 3. Rendre visible le bouton de suppression sur le clone
+  const removeBtn = clone.querySelector('button[onclick="removeEducation(this)"]');
+  if (removeBtn) {
+      removeBtn.style.display = 'block';
+  } else {
+      // Si le bouton n'existait pas (car première entrée), l'ajouter
+      const newRemoveBtn = document.createElement('button');
+      newRemoveBtn.setAttribute('type', 'button');
+      newRemoveBtn.setAttribute('onclick', 'removeEducation(this)');
+      newRemoveBtn.className = 'absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10';
+      newRemoveBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+      clone.prepend(newRemoveBtn);
+  }
+  
   container.appendChild(clone);
+  eduCount++; // Incrémenter pour le prochain ajout
+  toggleRemoveButtons();
 }
-</script>
 
-</body>
-</html>
+/**
+ * Supprime l'entrée de formation associée au bouton cliqué.
+ * @param {HTMLButtonElement} button - Le bouton de suppression qui a été cliqué.
+ */
+function removeEducation(button) {
+  const entry = button.closest('.educationEntry');
+  if (entry) {
+    entry.remove();
+    toggleRemoveButtons();
+  }
+}
+
+/**
+ * Gère l'affichage des boutons de suppression (masqué s'il n'y a qu'une seule entrée).
+ */
+function toggleRemoveButtons() {
+    const entries = document.querySelectorAll('.educationEntry');
+    const removeButtons = document.querySelectorAll('.educationEntry button[onclick="removeEducation(this)"]');
+    
+    if (entries.length <= 1) {
+        removeButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        removeButtons.forEach(btn => btn.style.display = 'block');
+    }
+}
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+    // S'assurer que les sections mémoire sont bien masquées si non cochées
+    document.querySelectorAll('.educationEntry').forEach(entry => {
+        const hasThesisCheckbox = entry.querySelector('.has_thesis');
+        if (hasThesisCheckbox && !hasThesisCheckbox.checked) {
+            entry.querySelector('.thesis-section')?.classList.add('hidden');
+        }
+    });
+    
+    // Gérer l'affichage des boutons de suppression
+    toggleRemoveButtons();
+});
+</script>
+{% endblock %}

@@ -1,144 +1,126 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Aperçu CV</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+{% extends "base.html" %}
 
-<div class="flex min-h-screen">
+{% block title %}Revue Finale du CV{% endblock %}
 
-  <!-- SIDEBAR -->
-  <aside class="w-72 bg-white shadow-md p-6 border-r">
-    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-base font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="text-blue-600 font-bold">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block content %}
+    <div class="w-full max-w-5xl mx-auto space-y-10">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">📄</span> Revue Finale & Génération
+      </h1>
+      
+      <p class="text-gray-600 text-center text-lg">Vérifiez toutes vos informations avant de générer le document. Cliquez sur les boutons **Modifier** si vous trouvez une erreur.</p>
 
-  <!-- CONTENU -->
-  <main class="flex-1 p-10">
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow">
+      <div class="flex flex-col md:flex-row justify-center gap-6 p-4 rounded-lg bg-indigo-50 border border-indigo-200 shadow-md">
+          <a href="{{ url_for('generate_cv') }}" class="flex-1 text-center bg-green-600 text-white font-bold text-xl py-3 rounded-lg hover:bg-green-700 transition duration-150 shadow-lg transform hover:scale-[1.005]">
+            🚀 Générer le CV Final (PDF)
+          </a>
+          <button onclick="window.location.href='{{ url_for('step1') }}'" class="flex-1 text-center bg-gray-600 text-white font-bold text-xl py-3 rounded-lg hover:bg-gray-700 transition duration-150 shadow-lg transform hover:scale-[1.005]">
+            ✏️ Modifier (Retour à l'étape 1)
+          </button>
+      </div>
 
-      <!-- HEADER -->
-      <div class="flex items-start mb-6">
-        {% if data.personal_info.photo_filename %}
-        <img src="{{ url_for('static', filename='uploads/' + data.personal_info.photo_filename) }}" alt="Photo" class="w-24 h-24 rounded mr-6 object-cover">
-        {% endif %}
-        <div>
-          <h1 class="text-3xl font-bold">{{ data.personal_info.name }}</h1>
-          <p class="text-gray-600">{{ data.personal_info.phone }} | {{ data.personal_info.email }}</p>
-          {% if data.personal_info.linkedin %}
-          <a href="{{ data.personal_info.linkedin }}" class="text-blue-600 underline" target="_blank">{{ data.personal_info.linkedin }}</a>
-          {% endif %}
+      <div class="space-y-12">
+          
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 class="text-2xl font-semibold text-gray-800">1. Infos Personnelles & Langues</h2>
+                <a href="{{ url_for('step1') }}" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Modifier</a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                <div><span class="font-medium">Nom:</span> {{ session.personal_info.name | default('N/A') }}</div>
+                <div><span class="font-medium">Email:</span> {{ session.personal_info.email | default('N/A') }}</div>
+                <div><span class="font-medium">Téléphone:</span> {{ session.personal_info.phone | default('N/A') }}</div>
+                <div><span class="font-medium">LinkedIn:</span> <a href="{{ session.personal_info.linkedin }}" target="_blank" class="text-blue-500 hover:underline">{{ session.personal_info.linkedin | default('N/A') }}</a></div>
+            </div>
+            
+            <h3 class="text-xl font-medium mt-6 mb-2 border-t pt-4">Langues ({{ session.languages | length if session.languages else 0 }})</h3>
+            <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                {% for lang in session.languages %}
+                <li>
+                    <span class="font-medium">{{ lang.name }}</span> : 
+                    {% if lang.speak %}Parlé{% endif %}
+                    {% if lang.read %}{% if lang.speak %}, {% endif %}Lu{% endif %}
+                    {% if lang.write %}{% if lang.speak or lang.read %}, {% endif %}Écrit{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
         </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 class="text-2xl font-semibold text-gray-800">2. Formations ({{ session.education | length if session.education else 0 }})</h2>
+                <a href="{{ url_for('step2') }}" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Modifier</a>
+            </div>
+            <div class="space-y-4">
+                {% for edu in session.education %}
+                <div class="p-3 border-l-4 border-blue-400 bg-blue-50/50 rounded-r-lg">
+                    <p class="font-bold text-lg text-gray-900">{{ edu.degree }}</p>
+                    <p class="text-gray-600">{{ edu.school }} ({{ edu.start_year }} - {{ edu.end_year if not edu.in_progress else 'En cours' }})</p>
+                    {% if edu.thesis_subject %}<p class="text-sm italic mt-1">Mémoire: {{ edu.thesis_subject }}</p>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 class="text-2xl font-semibold text-gray-800">3. Compétences ({{ session.skills | length if session.skills else 0 }})</h2>
+                <a href="{{ url_for('step3') }}" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Modifier</a>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                {% for skill in session.skills %}
+                    <span class="px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm font-medium">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 class="text-2xl font-semibold text-gray-800">4. Expériences ({{ session.experiences | length if session.experiences else 0 }})</h2>
+                <a href="{{ url_for('step4') }}" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Modifier</a>
+            </div>
+            <div class="space-y-4">
+                {% for exp in session.experiences %}
+                <div class="p-3 border-l-4 border-indigo-400 bg-indigo-50/50 rounded-r-lg">
+                    <p class="font-bold text-lg text-gray-900">{{ exp.title }} chez {{ exp.company }}</p>
+                    <p class="text-gray-600 text-sm">{{ exp.start_date }} - {{ exp.end_date if not exp.current else 'Actuellement' }} ({{ exp.type }})</p>
+                    <p class="mt-2 text-sm text-gray-700">{{ exp.description | truncate(150) }}...</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 class="text-2xl font-semibold text-gray-800">5. Projets, Certifications & Divers</h2>
+                <div class="flex gap-4">
+                    <a href="{{ url_for('step5') }}" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Modifier Projets</a>
+                    <a href="{{ url_for('step6') }}" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Modifier Certifs</a>
+                </div>
+            </div>
+            
+            <h3 class="text-xl font-medium mb-2">Projets ({{ session.distinctions | length if session.distinctions else 0 }})</h3>
+            <ul class="list-disc pl-5 text-gray-600 space-y-1 mb-6">
+                {% for dist in session.distinctions %}
+                <li><span class="font-medium">{{ dist.title }}</span> ({{ dist.year }}) - {{ dist.type }}</li>
+                {% endfor %}
+            </ul>
+            
+            <h3 class="text-xl font-medium mt-4 mb-2 border-t pt-4">Certifications ({{ session.certifications | length if session.certifications else 0 }})</h3>
+            <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                {% for cert in session.certifications %}
+                <li><span class="font-medium">{{ cert.title }}</span> de {{ cert.issuer }} ({{ cert.year }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
       </div>
 
-      <!-- COMPETENCES -->
-      {% if data.skills %}
-      <h2 class="text-xl font-semibold mt-6 mb-2">🛠️ Compétences</h2>
-      <ul class="list-disc list-inside text-gray-700">
-        {% for skill in data.skills %}
-        <li>{{ skill }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-      <!-- LANGUES -->
-      {% if data.languages %}
-      <h2 class="text-xl font-semibold mt-6 mb-2">🌐 Langues</h2>
-      <ul class="list-disc list-inside text-gray-700">
-        {% for lang in data.languages %}
-        <li>
-          <strong>{{ lang.name }}</strong> :
-          {% if lang.speak %} Parlé {% endif %}
-          {% if lang.read %} Lu {% endif %}
-          {% if lang.write %} Écrit {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-      <!-- EXPERIENCES -->
-      {% if data.experiences %}
-      <h2 class="text-xl font-semibold mt-6 mb-2">🏢 Expériences professionnelles</h2>
-      {% for exp in data.experiences %}
-      <div class="mb-4">
-        <p class="font-semibold">{{ exp.title }}</p>
-        <p class="text-sm text-gray-600">{{ exp.company }} — {{ exp.location }} | {{ exp.type }}</p>
-        <p class="text-sm text-gray-500">
-          {{ exp.start_date }} {% if exp.current %}– Aujourd’hui{% else %}– {{ exp.end_date }}{% endif %}
-        </p>
-        {% if exp.description %}
-        <p class="mt-1 text-gray-700 text-sm whitespace-pre-line">{{ exp.description }}</p>
-        {% endif %}
-        {% if exp.ref_name %}
-        <p class="text-sm mt-1"><strong>Référence :</strong> {{ exp.ref_name }} – {{ exp.ref_contact }}</p>
-        {% endif %}
+      <div class="pt-6 border-t">
+          <a href="{{ url_for('generate_cv') }}" class="w-full block text-center bg-green-600 text-white font-bold text-xl py-4 rounded-lg hover:bg-green-700 transition duration-150 shadow-lg">
+            Générer le CV Final (PDF) 🚀
+          </a>
       </div>
-      {% endfor %}
-      {% endif %}
-
-      <!-- PROJETS -->
-      {% if data.distinctions %}
-      <h2 class="text-xl font-semibold mt-6 mb-2">🏆 Projets & Distinctions</h2>
-      {% for item in data.distinctions %}
-      <div class="mb-3">
-        <p class="font-semibold">{{ item.title }} – <span class="text-gray-600">{{ item.year }}</span> <em class="text-sm">({{ item.type }})</em></p>
-        {% if item.description %}
-        <p class="text-sm text-gray-700">{{ item.description }}</p>
-        {% endif %}
-      </div>
-      {% endfor %}
-      {% endif %}
-
-      <!-- FORMATIONS -->
-      {% if data.education %}
-      <h2 class="text-xl font-semibold mt-6 mb-2">🎓 Formations</h2>
-      {% for edu in data.education %}
-      <div class="mb-3">
-        <p class="font-semibold">{{ edu.degree }} – {{ edu.school }}</p>
-        <p class="text-sm text-gray-600">{{ edu.start_year }} {% if edu.in_progress %}– en cours{% else %}– {{ edu.end_year }}{% endif %}</p>
-        <ul class="list-disc list-inside text-sm text-gray-700 mt-1">
-          {% for course in edu.courses %}
-          {% if course %}<li>{{ course }}</li>{% endif %}
-          {% endfor %}
-        </ul>
-      </div>
-      {% endfor %}
-      {% endif %}
-
-      <!-- CERTIFICATIONS -->
-      {% if data.certifications %}
-      <h2 class="text-xl font-semibold mt-6 mb-2">📜 Certifications</h2>
-      {% for cert in data.certifications %}
-      <div class="mb-3">
-        <p class="font-semibold">{{ cert.name }} – {{ cert.issuer }}{% if cert.year %} ({{ cert.year }}){% endif %}</p>
-        {% if cert.link %}
-        <a href="{{ cert.link }}" target="_blank" class="text-blue-600 text-sm">🔗 Voir certificat</a>
-        {% endif %}
-      </div>
-      {% endfor %}
-      {% endif %}
-
-      <!-- BOUTON PDF -->
-      <div class="mt-8 text-center">
-        <a href="/generate_cv" class="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 text-lg font-semibold">
-          📄 Télécharger le CV (PDF)
-        </a>
-      </div>
-
     </div>
-  </main>
-</div>
-
-</body>
-</html>
+{% endblock %}

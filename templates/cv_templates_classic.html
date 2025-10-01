@@ -6,45 +6,47 @@
   <style>
     /* VARIABLES/ACCENT */
     :root {
-      --primary-color: #1E3A8A; /* Bleu foncé */
-      --secondary-color: #3B82F6; /* Bleu clair */
-      --text-dark: #1F2937; /* Gris très foncé */
-      --text-subtle: #6B7280; /* Gris moyen */
+      --primary-color: #1F2937; /* Gris très foncé (presque noir) */
+      --secondary-color: #374151; /* Gris foncé (pour les titres) */
+      --accent-color: #1E3A8A; /* Bleu foncé */
+      --text-subtle: #6B7280; /* Gris moyen pour les dates/détails */
     }
 
     /* BASE */
     body {
-      font-family: 'Times New Roman', Times, serif; /* Souvent préféré pour les CV PDF */
+      font-family: 'Times New Roman', Times, serif; 
       margin: 40px;
       font-size: 11pt;
-      color: var(--text-dark);
+      color: var(--primary-color);
       line-height: 1.4;
     }
     a {
-      color: var(--primary-color);
+      color: var(--accent-color);
       font-size: 10pt;
       text-decoration: none;
     }
 
     /* TYPOGRAPHIE */
     h1 { 
-      font-size: 22pt; 
+      font-size: 24pt; 
       margin: 0; 
-      color: var(--primary-color);
-    }
-    h2 {
-      font-size: 14pt;
-      margin-top: 20px;
-      margin-bottom: 6px;
-      padding-bottom: 3px;
-      border-bottom: 2px solid var(--secondary-color); /* Ligne d'accentuation */
       color: var(--primary-color);
       font-weight: bold;
     }
+    h2 {
+      font-size: 14pt;
+      margin-top: 24px; /* Plus d'espace pour la séparation */
+      margin-bottom: 6px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid var(--text-subtle); /* Ligne de séparation subtile */
+      color: var(--secondary-color);
+      font-weight: bold;
+      text-transform: uppercase;
+    }
     h3 {
-      font-size: 12pt;
+      font-size: 11pt;
       margin: 10px 0 2px 0;
-      color: var(--text-dark);
+      color: var(--primary-color);
       font-weight: bold;
     }
 
@@ -65,13 +67,20 @@
       font-size: 9pt;
       color: var(--text-subtle);
     }
-    .text-accent {
-      color: var(--secondary-color);
-    }
     .date-range {
       font-style: italic;
       color: var(--text-subtle);
       font-size: 9pt;
+      margin-top: 0;
+    }
+    .contact-info {
+        font-size: 10pt;
+        color: var(--secondary-color);
+        margin-top: 6px;
+    }
+    .detail-list {
+        margin: 0;
+        padding-left: 15px;
     }
   </style>
 </head>
@@ -81,18 +90,24 @@
 <table style="width: 100%; margin-bottom: 16px;">
   <tr>
     <td style="width: auto; vertical-align: top;">
-      <h1 style="font-size: 22pt; margin: 0; color: var(--primary-color);">{{ data.personal_info.name | upper }}</h1>
-      <p style="margin: 4px 0 0 0; font-size: 10pt;">
-        {{ data.personal_info.phone }} | 
-        <a href="mailto:{{ data.personal_info.email }}">{{ data.personal_info.email }}</a>
+      <h1 style="font-size: 22pt; margin: 0;">{{ data.personal_info.name | upper }}</h1>
+      <div class="contact-info">
+        <p>
+          {% if data.personal_info.phone %}
+            <strong>Tél:</strong> {{ data.personal_info.phone }} | 
+          {% endif %}
+          {% if data.personal_info.email %}
+            <a href="mailto:{{ data.personal_info.email }}">{{ data.personal_info.email }}</a>
+          {% endif %}
+        </p>
         {% if data.personal_info.linkedin %}
-        | <a href="{{ data.personal_info.linkedin }}">LinkedIn</a>
+          <p><a href="{{ data.personal_info.linkedin }}">LinkedIn</a></p>
         {% endif %}
-      </p>
+      </div>
     </td>
     {% if data.personal_info.photo_path %}
     <td style="width: 95px; text-align: right; vertical-align: top;">
-      <img src="{{ data.personal_info.photo_path }}" style="width: 90px; height: 90px; border-radius: 8px; border: 1px solid #ccc; object-fit: cover; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+      <img src="{{ data.personal_info.photo_path }}" style="width: 90px; height: 90px; border-radius: 8px; border: 1px solid #ccc; object-fit: cover; box-shadow: 1px 1px 3px rgba(0,0,0,0.1);">
     </td>
     {% endif %}
   </tr>
@@ -101,9 +116,9 @@
 {% if data.experiences %}
 <h2>Expériences Professionnelles</h2>
 {% for exp in data.experiences | reverse %}
-  <h3>{{ exp.title }} <span class="text-accent">@ {{ exp.company }}</span></h3>
+  <h3>{{ exp.title }} <span style="font-weight: normal;">chez {{ exp.company }}</span></h3>
   <p class="date-range">{{ exp.type }} | {{ exp.start_date }} {% if exp.current %}– Aujourd’hui{% else %}– {{ exp.end_date }}{% endif %} | {{ exp.location }}</p>
-  <ul>
+  <ul class="detail-list">
     {% for task in exp.description.split('\n') %}
       {% if task.strip() %}<li>{{ task.strip() | replace('-', '') }}</li>{% endif %}
     {% endfor %}
@@ -114,14 +129,15 @@
 {% endfor %}
 {% endif %}
 
+---
 {% if data.education %}
 <h2>Formation</h2>
 {% for edu in data.education | reverse %}
-  <h3>{{ edu.degree }} <span class="text-accent">@ {{ edu.school }}</span></h3>
+  <h3>{{ edu.degree }} <span style="font-weight: normal;">@ {{ edu.school }}</span></h3>
   <p class="date-range">{{ edu.start_year }} {% if edu.in_progress %}– En cours{% else %}– {{ edu.end_year }}{% endif %}</p>
   
   {% if edu.courses | select('length') | list %}
-  <p style="margin-top: 5px; margin-bottom: 2px; font-weight: bold; font-size: 10pt;">Cours phares :</p>
+  <p style="margin-top: 5px; margin-bottom: 2px; font-size: 10pt;">**Matières/Cours principaux :**</p>
   <ul style="list-style-type: circle; margin-top: 0;">
     {% for course in edu.courses %}
       {% if course %}<li>{{ course }}</li>{% endif %}
@@ -130,15 +146,15 @@
   {% endif %}
   
   {% if edu.thesis_subject %}
-  <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 10pt;">Mémoire/Thèse :</p>
-  <p style="margin: 0;">{{ edu.thesis_subject }}</p>
+  <p style="margin: 5px 0 0 0; font-size: 10pt;">**Mémoire/Thèse :** {{ edu.thesis_subject }}</p>
   <p class="subtle">Encadrant(s) : {{ edu.thesis_supervisors }}</p>
   {% endif %}
 {% endfor %}
 {% endif %}
 
+---
 {% if data.skills or data.languages %}
-<h2>Compétences Techniques & Linguistiques</h2>
+<h2>Compétences & Langues</h2>
 {% endif %}
 
 {% if data.skills %}
@@ -164,22 +180,24 @@
 </p>
 {% endif %}
 
+---
 {% if data.distinctions %}
-<h2>Projets, Prix & Publications</h2>
-<ul>
+<h2>Projets & Distinctions</h2>
+<ul class="detail-list">
   {% for item in data.distinctions %}
   <li style="font-size: 10pt;">
     <span style="font-weight: bold;">{{ item.title }}</span> ({{ item.year }}) - 
-    <span class="text-accent">{{ item.type }}</span>
+    <span class="subtle">{{ item.type }}</span>
     {% if item.description %}: {{ item.description }}{% endif %}
   </li>
   {% endfor %}
 </ul>
 {% endif %}
 
+---
 {% if data.certifications %}
-<h2>Certifications & Brevets</h2>
-<ul>
+<h2>Certifications</h2>
+<ul class="detail-list">
   {% for cert in data.certifications %}
   <li>
     <span style="font-weight: bold;">{{ cert.title }}</span> – {{ cert.issuer }}{% if cert.year %} ({{ cert.year }}){% endif %}
@@ -191,7 +209,7 @@
 </ul>
 {% endif %}
 
-<footer style="font-size: 8pt; text-align: center; color: #aaa; margin-top: 30px;">
+<footer style="font-size: 8pt; text-align: center; color: #aaa; margin-top: 40px;">
   CV généré automatiquement - {{ data.personal_info.name }} le {{ today | default('Date') }}
 </footer>
 

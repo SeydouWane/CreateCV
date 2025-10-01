@@ -1,88 +1,150 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Étape 6 : Certificats</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+{% extends "base.html" %}
 
-<div class="flex min-h-screen">
+{% block title %}Étape 6 - Certifications et Cours en ligne{% endblock %}
 
-  <!-- Sidebar -->
-  <aside class="w-72 bg-white shadow-md p-6 border-r">
-    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-base font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="text-blue-600 font-bold">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block content %}
+    <div class="w-full max-w-4xl mx-auto space-y-8">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">📜</span> Étape 6 : Certifications & Cours en ligne
+      </h1>
+      
+      <p class="text-gray-600 text-center">Ajoutez toutes les certifications officielles, brevets, et cours en ligne complétés qui renforcent votre profil professionnel.</p>
 
-  <!-- Contenu principal -->
-  <main class="flex-1 p-10">
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded shadow">
-      <h1 class="text-2xl font-bold mb-6 text-gray-800">📜 Étape 6 : Certificats & Certifications</h1>
+      <form method="POST" id="certificationsForm" class="space-y-6">
+        
+        <div id="certificationsFields" class="space-y-6">
+        {% for cert in certifications %}
+            <div class="certificationEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
 
-      <form method="POST" id="certificationForm">
-        <div id="certificationFields" class="space-y-6">
-        {% for c in certifications %}
-        <div class="certificationEntry bg-gray-50 border p-6 rounded">
-            <label class="block font-semibold mb-1">Nom du certificat :</label>
-            <input type="text" name="name[]" class="w-full border p-2 rounded mb-4" value="{{ c.name | default('') }}" required>
+                {% if loop.length > 1 %}
+                <button type="button" onclick="removeCertification(this)" class="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10" aria-label="Supprimer cette certification">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+                {% endif %}
 
-            <label class="block font-semibold mb-1">Organisme :</label>
-            <input type="text" name="issuer[]" class="w-full border p-2 rounded mb-4" value="{{ c.issuer | default('') }}" required>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Titre de la Certification/Cours :</label>
+                        <input type="text" name="title[]" value="{{ cert.title | default('') }}" placeholder="Ex: Certifié AWS Cloud Practitioner" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
 
-            <label class="block font-semibold mb-1">Année d’obtention :</label>
-            <input type="text" name="year[]" placeholder="ex: 2023" class="w-full border p-2 rounded mb-4" value="{{ c.year | default('') }}">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Émetteur/Plateforme :</label>
+                        <input type="text" name="issuer[]" value="{{ cert.issuer | default('') }}" placeholder="Ex: Microsoft, Coursera, IBM" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
 
-            <label class="block font-semibold mb-1">Lien (optionnel) :</label>
-            <input type="url" name="link[]" placeholder="https://..." class="w-full border p-2 rounded" value="{{ c.link | default('') }}">
-        </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année d'obtention :</label>
+                        <input type="text" name="year[]" value="{{ cert.year | default('') }}" placeholder="Ex: 2024" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
+                    <label class="font-medium block mb-1 text-gray-700">Lien du certificat ou code de vérification (optionnel) :</label>
+                    <input type="url" name="url[]" value="{{ cert.url | default('') }}" placeholder="Ex: https://verify.certif.com/xyz123" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+            </div>
         {% endfor %}
+
+        {% if not certifications %}
+            <div class="certificationEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Titre de la Certification/Cours :</label>
+                        <input type="text" name="title[]" placeholder="Ex: Python pour la Data Science" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Émetteur/Plateforme :</label>
+                        <input type="text" name="issuer[]" placeholder="Ex: Google, Udemy, Linux Foundation" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année d'obtention :</label>
+                        <input type="text" name="year[]" placeholder="Ex: 2024" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
+                    <label class="font-medium block mb-1 text-gray-700">Lien du certificat ou code de vérification (optionnel) :</label>
+                    <input type="url" name="url[]" placeholder="Ex: https://verify.certif.com/xyz123" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+            </div>
+        {% endif %}
         </div>
 
+        <button type="button" onclick="addCertification()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-md font-medium">
+          ➕ Ajouter une certification
+        </button>
 
-        <div class="flex flex-col md:flex-row justify-between items-center mt-8 space-y-4 md:space-y-0">
-          <button type="button" onclick="addCertification()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
-            ➕ Ajouter une certification
-          </button>
-
-          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow">
-            Valider ✅
+        <div class="mt-6 border-t pt-6">
+          <button type="submit" class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
+            Terminer & Générer le CV 🚀
           </button>
         </div>
       </form>
     </div>
-  </main>
-</div>
 
 <script>
+/**
+ * Ajoute une nouvelle entrée de certification vide.
+ */
 function addCertification() {
-  const div = document.createElement('div');
-  div.className = 'certificationEntry bg-gray-50 border p-6 rounded mt-4';
-  div.innerHTML = `
-    <label class="block font-semibold mb-1">Nom du certificat :</label>
-    <input type="text" name="name[]" class="w-full border p-2 rounded mb-4" required>
+  const container = document.getElementById('certificationsFields');
+  const baseEntry = container.querySelector('.certificationEntry');
+  
+  if (!baseEntry) return;
 
-    <label class="block font-semibold mb-1">Organisme :</label>
-    <input type="text" name="issuer[]" class="w-full border p-2 rounded mb-4" required>
-
-    <label class="block font-semibold mb-1">Année d’obtention :</label>
-    <input type="text" name="year[]" placeholder="ex: 2023" class="w-full border p-2 rounded mb-4">
-
-    <label class="block font-semibold mb-1">Lien (optionnel) :</label>
-    <input type="url" name="link[]" placeholder="https://..." class="w-full border p-2 rounded">
-  `;
-  document.getElementById('certificationFields').appendChild(div);
+  const clone = baseEntry.cloneNode(true);
+  
+  // 1. Réinitialiser les valeurs des inputs
+  clone.querySelectorAll('input').forEach(input => {
+    input.value = '';
+  });
+  
+  // 2. Rendre visible le bouton de suppression sur le clone (s'il n'existait pas)
+  let removeBtn = clone.querySelector('button[onclick="removeCertification(this)"]');
+  if (!removeBtn) {
+      removeBtn = document.createElement('button');
+      removeBtn.setAttribute('type', 'button');
+      removeBtn.setAttribute('onclick', 'removeCertification(this)');
+      removeBtn.className = 'absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10';
+      removeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+      clone.prepend(removeBtn);
+  } else {
+      removeBtn.style.display = 'block';
+  }
+  
+  container.appendChild(clone);
+  toggleRemoveButtons();
 }
-</script>
 
-</body>
-</html>
+/**
+ * Supprime l'entrée de certification associée au bouton cliqué.
+ * @param {HTMLButtonElement} button - Le bouton de suppression.
+ */
+function removeCertification(button) {
+  const entry = button.closest('.certificationEntry');
+  if (entry) {
+    entry.remove();
+    toggleRemoveButtons();
+  }
+}
+
+/**
+ * Gère l'affichage des boutons de suppression.
+ */
+function toggleRemoveButtons() {
+    const entries = document.querySelectorAll('.certificationEntry');
+    const removeButtons = document.querySelectorAll('.certificationEntry button[onclick="removeCertification(this)"]');
+    
+    // Empêcher la suppression si une seule entrée est présente
+    if (entries.length <= 1) {
+        removeButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        removeButtons.forEach(btn => btn.style.display = 'block');
+    }
+}
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', toggleRemoveButtons);
+</script>
+{% endblock %}

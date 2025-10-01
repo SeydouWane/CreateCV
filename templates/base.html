@@ -2,13 +2,97 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Création de CV</title>
+    <title>{% block title %}Création de CV{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* S'assurer que le contenu principal défile correctement */
+        .flex-1 {
+            overflow-y: auto;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        {% block content %}
-        {% endblock %}
-    </div>
+<body class="bg-gray-50 font-sans">
+
+{% set current_path = request.path %}
+
+{% set steps = [
+    ('step1', '👤 Infos Perso'),
+    ('step1a', '🌐 Langues'),
+    ('step2', '🎓 Formations'),
+    ('step3', '🛠️ Compétences'),
+    ('step4', '🏢 Expériences'),
+    ('step5', '🏆 Projets'),
+    ('step6', '📜 Certifications'),
+    ('template_select', '🎨 Choix Template'),
+    ('review', '📄 Revue Finale')
+] %}
+
+<div class="flex min-h-screen">
+    
+    <aside class="w-72 bg-white shadow-xl p-6 border-r border-gray-200 sticky top-0 h-screen flex flex-col justify-between">
+        
+        <div>
+            <h2 class="text-2xl font-extrabold mb-8 text-indigo-700">📝 CV Builder</h2>
+            
+            <ul class="space-y-3 text-base">
+                {% for endpoint, label in steps %}
+                {% set is_active = current_path == url_for(endpoint) %}
+                {% set step_index = loop.index %}
+
+                <li>
+                    <a href="{{ url_for(endpoint) }}"
+                       class="flex items-center p-3 rounded-lg transition duration-200 
+                              {% if is_active %}
+                                  bg-indigo-50 text-indigo-700 font-bold shadow-sm border border-indigo-200
+                              {% else %}
+                                  text-gray-600 hover:bg-gray-100 hover:text-gray-800
+                              {% endif %}">
+                        <span class="mr-3 w-5 h-5 flex items-center justify-center text-sm">
+                            {% if is_active %}
+                                <span class="font-extrabold text-indigo-700">{{ step_index }}</span>
+                            {% else %}
+                                {{ step_index }}
+                            {% endif %}
+                        </span>
+                        {{ label }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="pt-6 border-t border-gray-200 text-sm">
+            <p class="font-bold text-gray-700 mb-2">Besoin d'aide ? Contactez-moi :</p>
+            <ul class="space-y-1 text-gray-600">
+                <li>
+                    <a href="tel:+221774532238" class="hover:text-indigo-600 transition duration-150">
+                        📞 00221774532238
+                    </a>
+                </li>
+                <li>
+                    <a href="mailto:papaseydou.wane@unchk.edu.sn" class="hover:text-indigo-600 transition duration-150">
+                        📧 papaseydou.wane@unchk.edu.sn
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.linkedin.com/in/papa-seydou-wane-37abaa1a1/" target="_blank" class="hover:text-indigo-600 transition duration-150">
+                        🔗 LinkedIn
+                    </a>
+                </li>
+            </ul>
+            <p class="text-xs text-gray-400 text-center mt-4">CV Builder | Version 1.0</p>
+        </div>
+
+    </aside>
+
+    <main class="flex-1 p-10">
+        <div class="w-full bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
+            {% block content %}
+                {% endblock %}
+        </div>
+    </main>
+</div>
+
 </body>
 </html>

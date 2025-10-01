@@ -16,3 +16,4 @@ zopfli==0.2.3.post1
 xhtml2pdf==0.2.11
 pycparser==2.22
 six==1.17.0
+weasyprint

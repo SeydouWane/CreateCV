@@ -1,72 +1,105 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Étape 3 : Compétences</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+{% extends "base.html" %}
 
-<div class="flex min-h-screen">
+{% block title %}Étape 3 - Compétences{% endblock %}
 
-  <!-- Sidebar -->
-  <aside class="w-72 bg-white shadow-md p-6 border-r">
-    <h2 class="text-xl font-bold mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-base font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="text-blue-600 font-bold">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="hover:text-blue-600">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block content %}
+    <div class="w-full max-w-2xl mx-auto space-y-8">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">🛠️</span> Étape 3 : Compétences
+      </h1>
+      
+      <p class="text-gray-600 text-center">Ajoutez vos compétences techniques, linguistiques et autres points forts. Vous pouvez également préciser votre niveau (Ex: Python - Expert).</p>
 
-  <!-- Contenu principal -->
-  <!-- Contenu principal -->
-<main class="flex-1 p-10">
-  <div class="max-w-2xl mx-auto bg-white p-8 rounded shadow">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800">Étape 3 : Compétences</h1>
+      <form method="POST" id="skillsForm" class="space-y-6">
+        
+        <div id="skillsFields" class="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-inner">
+          <label class="font-semibold block mb-3 text-gray-800">Liste des compétences :</label>
+          
+          {% for skill in skills %}
+          <div class="skillEntry flex items-center space-x-3">
+              <input type="text" name="skills[]" value="{{ skill | default('') }}" placeholder="Ex: JavaScript, Docker, Gestion de projet..." required 
+                     class="flex-1 border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+              
+              {% if loop.length > 1 %}
+              <button type="button" onclick="removeSkill(this)" class="text-red-500 hover:text-red-700 p-2 rounded-full transition bg-white shadow-sm" aria-label="Supprimer cette compétence">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+              {% endif %}
+          </div>
+          {% endfor %}
 
-    <!-- ✅ FORMULAIRE AJOUTÉ ICI -->
-    <form method="POST">
-      <div id="skillsFields" class="space-y-6">
-        {% for skill in skills %}
-        <div class="skillEntry border p-4 rounded bg-gray-50">
-          <label class="font-semibold block mb-2">Compétence :</label>
-          <input type="text" name="skills[]" value="{{ skill }}" required class="w-full border p-2 rounded">
+          {% if not skills %}
+          <div class="skillEntry flex items-center space-x-3">
+              <input type="text" name="skills[]" placeholder="Ex: Microsoft Azure, Anglais - C1" required 
+                     class="flex-1 border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          {% endif %}
         </div>
-        {% endfor %}
-      </div>
 
-      <button type="button" onclick="addSkill()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        ➕ Ajouter une compétence
-      </button>
+        <button type="button" onclick="addSkill()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-md font-medium">
+          + Ajouter une compétence
+        </button>
 
-      <div class="mt-6">
-        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Suivant ⏩</button>
-      </div>
-    </form>
-    <!-- ✅ FIN DU FORMULAIRE -->
-  </div>
-</main>
-
-</div>
+        <div class="mt-6 border-t pt-6">
+          <button type="submit" class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
+            Suivant ⏩
+          </button>
+        </div>
+      </form>
+    </div>
 
 <script>
+/**
+ * Ajoute un nouveau champ de compétence vide.
+ */
 function addSkill() {
-  const container = document.getElementById('skillsFields');
-  const div = document.createElement('div');
-  div.className = "skillEntry border p-4 rounded bg-gray-50";
+  const container = document.getElementById("skillsFields");
+  const div = document.createElement("div");
+  
+  div.className = "skillEntry flex items-center space-x-3";
   div.innerHTML = `
-    <label class="font-semibold block mb-2">Compétence :</label>
-    <input type="text" name="skills[]" required class="w-full border p-2 rounded">
+    <input type="text" name="skills[]" placeholder="Ex: Compétence technique, soft skill..." required 
+           class="flex-1 border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+    <button type="button" onclick="removeSkill(this)" class="text-red-500 hover:text-red-700 p-2 rounded-full transition bg-white shadow-sm" aria-label="Supprimer cette compétence">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+    </button>
   `;
   container.appendChild(div);
+  
+  // S'assurer que le bouton de suppression apparaît sur les autres entrées
+  toggleRemoveButtons();
 }
-</script>
 
-</body>
-</html>
+/**
+ * Supprime le champ de compétence associé au bouton cliqué.
+ * @param {HTMLButtonElement} button - Le bouton de suppression.
+ */
+function removeSkill(button) {
+  const entry = button.closest('.skillEntry');
+  if (entry) {
+    entry.remove();
+    // Re-évalue l'affichage des boutons de suppression
+    toggleRemoveButtons();
+  }
+}
+
+/**
+ * Gère l'affichage des boutons de suppression (masqué s'il n'y a qu'une seule entrée).
+ */
+function toggleRemoveButtons() {
+    const entries = document.querySelectorAll('.skillEntry');
+    const removeButtons = document.querySelectorAll('.skillEntry button[onclick="removeSkill(this)"]');
+    
+    // Si la page contient une seule entrée (ou moins), on cache tous les boutons de suppression.
+    if (entries.length <= 1) {
+        removeButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        removeButtons.forEach(btn => btn.style.display = 'block');
+    }
+}
+
+// Initialisation au chargement : gérer l'affichage des boutons de suppression
+document.addEventListener('DOMContentLoaded', toggleRemoveButtons);
+</script>
+{% endblock %}

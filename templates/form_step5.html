@@ -1,110 +1,166 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Étape 5 : Projets ou Distinctions</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+{% extends "base.html" %}
 
-<div class="flex min-h-screen">
+{% block title %}Étape 5 - Distinctions, Projets et Prix{% endblock %}
 
-  <!-- Sidebar -->
-  <aside class="w-72 bg-white shadow-lg p-6 border-r">
-    <h2 class="text-xl font-bold text-gray-800 mb-6">📝 Création de CV</h2>
-    <ul class="space-y-4 text-[16px] font-medium text-gray-700">
-      <li><a href="{{ url_for('step1') }}" class="hover:text-blue-600">🟦 Étape 1 : Infos Perso</a></li>
-      <li><a href="{{ url_for('step1a') }}" class="hover:text-blue-600">🌐 Étape 1a : Langues</a></li>
-      <li><a href="{{ url_for('step2') }}" class="hover:text-blue-600">🎓 Étape 2 : Formations</a></li>
-      <li><a href="{{ url_for('step3') }}" class="hover:text-blue-600">🛠️ Étape 3 : Compétences</a></li>
-      <li><a href="{{ url_for('step4') }}" class="hover:text-blue-600">🏢 Étape 4 : Expériences</a></li>
-      <li><a href="{{ url_for('step5') }}" class="text-blue-600 font-semibold">🏆 Étape 5 : Projets</a></li>
-      <li><a href="{{ url_for('step6') }}" class="hover:text-blue-600">📜 Étape 6 : Certifications</a></li>
-      <li><a href="{{ url_for('review') }}" class="hover:text-blue-600">📄 Revue finale</a></li>
-    </ul>
-  </aside>
+{% block content %}
+    <div class="w-full max-w-4xl mx-auto space-y-8">
+      
+      <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-4 text-center">
+          <span class="text-blue-600">🏆</span> Étape 5 : Distinctions, Projets & Prix
+      </h1>
+      
+      <p class="text-gray-600 text-center">Ajoutez toute distinction, publication, projet personnel notable ou reconnaissance professionnelle. Si une entrée est vide, elle sera ignorée.</p>
 
-  <!-- Contenu principal -->
-  <main class="flex-1 p-10">
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow-lg">
-      <h1 class="text-3xl font-bold text-gray-800 mb-6">🏆 Étape 5 : Distinctions ou Projets</h1>
+      <form method="POST" id="distinctionsForm" class="space-y-6">
+        
+        <div id="distinctionsFields" class="space-y-6">
+        {% for dist in distinctions %}
+            <div class="distinctionEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
 
-      <form method="POST" id="projectForm">
-        <div id="projectFields" class="space-y-6">
-        {% for d in distinctions %}
-        <div class="projectEntry border border-gray-300 p-6 bg-gray-50 rounded-lg">
-            <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-700">Type :</label>
-            <select name="type[]" class="w-full border-gray-300 rounded p-2">
-                <option value="Projet" {% if d.type == 'Projet' %}selected{% endif %}>Projet</option>
-                <option value="Distinction" {% if d.type == 'Distinction' %}selected{% endif %}>Distinction</option>
-            </select>
+                {% if loop.length > 1 %}
+                <button type="button" onclick="removeDistinction(this)" class="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10" aria-label="Supprimer cette distinction">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Titre (Ex: Nom du Projet / du Prix) :</label>
+                        <input type="text" name="title[]" value="{{ dist.title | default('') }}" placeholder="Titre de la distinction" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année :</label>
+                        <input type="text" name="year[]" value="{{ dist.year | default('') }}" placeholder="Ex: 2023" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Type :</label>
+                        <select name="type[]" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="Projet" {% if dist.type == 'Projet' %}selected{% endif %}>Projet Personnel</option>
+                            <option value="Prix" {% if dist.type == 'Prix' %}selected{% endif %}>Prix / Récompense</option>
+                            <option value="Publication" {% if dist.type == 'Publication' %}selected{% endif %}>Publication</option>
+                            <option value="Bénévole" {% if dist.type == 'Bénévole' %}selected{% endif %}>Bénévole / Autre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="font-semibold block mb-1 text-gray-700">Description / Réalisations :</label>
+                    <textarea name="description[]" rows="3" placeholder="Décrivez brièvement le projet ou la signification du prix." class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">{{ dist.description | default('') }}</textarea>
+                </div>
             </div>
-
-            <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-700">Titre :</label>
-            <input type="text" name="title[]" class="w-full border border-gray-300 p-2 rounded" value="{{ d.title | default('') }}" placeholder="Ex : Meilleur projet IA 2024">
-            </div>
-
-            <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-700">Description :</label>
-            <textarea name="description[]" rows="3" class="w-full border border-gray-300 p-2 rounded" placeholder="Décris brièvement...">{{ d.description | default('') }}</textarea>
-            </div>
-
-            <div>
-            <label class="block mb-1 font-medium text-gray-700">Année :</label>
-            <input type="text" name="year[]" class="w-full border border-gray-300 p-2 rounded" value="{{ d.year | default('') }}" placeholder="ex: 2023">
-            </div>
-        </div>
         {% endfor %}
+
+        {% if not distinctions %}
+            <div class="distinctionEntry bg-white p-6 rounded-lg border border-gray-200 shadow-lg relative">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Titre :</label>
+                        <input type="text" name="title[]" placeholder="Titre de la distinction" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Année :</label>
+                        <input type="text" name="year[]" placeholder="Ex: 2024" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1 text-gray-700">Type :</label>
+                        <select name="type[]" class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="Projet">Projet Personnel</option>
+                            <option value="Prix">Prix / Récompense</option>
+                            <option value="Publication">Publication</option>
+                            <option value="Bénévole">Bénévole / Autre</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1 text-gray-700">Description / Réalisations :</label>
+                    <textarea name="description[]" rows="3" placeholder="Décrivez brièvement le projet ou la signification du prix." class="w-full border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+            </div>
+        {% endif %}
         </div>
 
-        <!-- Boutons -->
-        <div class="flex flex-col md:flex-row justify-between items-center mt-8 space-y-4 md:space-y-0">
-          <button type="button" onclick="addProject()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
-            ➕ Ajouter un projet ou une distinction
-          </button>
+        <button type="button" onclick="addDistinction()" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-md font-medium">
+          ➕ Ajouter une distinction
+        </button>
 
-          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow">
+        <div class="mt-6 border-t pt-6">
+          <button type="submit" class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
             Suivant ⏩
           </button>
         </div>
       </form>
     </div>
-  </main>
-</div>
 
 <script>
-function addProject() {
-  const div = document.createElement('div');
-  div.className = 'projectEntry border border-gray-300 p-6 bg-gray-50 rounded-lg mt-6';
-  div.innerHTML = `
-    <div class="mb-4">
-      <label class="block mb-1 font-medium text-gray-700">Type :</label>
-      <select name="type[]" class="w-full border-gray-300 rounded p-2">
-        <option value="Projet">Projet</option>
-        <option value="Distinction">Distinction</option>
-      </select>
-    </div>
+/**
+ * Ajoute une nouvelle entrée de distinction vide.
+ */
+function addDistinction() {
+  const container = document.getElementById('distinctionsFields');
+  const baseEntry = container.querySelector('.distinctionEntry');
+  
+  if (!baseEntry) return;
 
-    <div class="mb-4">
-      <label class="block mb-1 font-medium text-gray-700">Titre :</label>
-      <input type="text" name="title[]" class="w-full border border-gray-300 p-2 rounded" placeholder="Ex : Concours Hackathon 2024">
-    </div>
+  const clone = baseEntry.cloneNode(true);
+  
+  // 1. Réinitialiser les valeurs des inputs/textareas
+  clone.querySelectorAll('input, textarea').forEach(input => {
+    input.value = '';
+  });
+  
+  // 2. Réinitialiser le selecteur
+  const select = clone.querySelector('select[name="type[]"]');
+  if (select) {
+      select.value = 'Projet';
+  }
 
-    <div class="mb-4">
-      <label class="block mb-1 font-medium text-gray-700">Description :</label>
-      <textarea name="description[]" rows="3" class="w-full border border-gray-300 p-2 rounded" placeholder="Décris brièvement..."></textarea>
-    </div>
-
-    <div>
-      <label class="block mb-1 font-medium text-gray-700">Année :</label>
-      <input type="text" name="year[]" class="w-full border border-gray-300 p-2 rounded" placeholder="ex: 2022">
-    </div>
-  `;
-  document.getElementById('projectFields').appendChild(div);
+  // 3. Rendre visible le bouton de suppression sur le clone (s'il n'existait pas)
+  let removeBtn = clone.querySelector('button[onclick="removeDistinction(this)"]');
+  if (!removeBtn) {
+      removeBtn = document.createElement('button');
+      removeBtn.setAttribute('type', 'button');
+      removeBtn.setAttribute('onclick', 'removeDistinction(this)');
+      removeBtn.className = 'absolute top-2 right-2 text-red-500 hover:text-red-700 p-1 rounded-full bg-red-50/50 transition z-10';
+      removeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+      clone.prepend(removeBtn);
+  } else {
+      removeBtn.style.display = 'block';
+  }
+  
+  container.appendChild(clone);
+  toggleRemoveButtons();
 }
-</script>
 
-</body>
-</html>
+/**
+ * Supprime l'entrée de distinction associée au bouton cliqué.
+ * @param {HTMLButtonElement} button - Le bouton de suppression.
+ */
+function removeDistinction(button) {
+  const entry = button.closest('.distinctionEntry');
+  if (entry) {
+    entry.remove();
+    toggleRemoveButtons();
+  }
+}
+
+/**
+ * Gère l'affichage des boutons de suppression.
+ */
+function toggleRemoveButtons() {
+    const entries = document.querySelectorAll('.distinctionEntry');
+    const removeButtons = document.querySelectorAll('.distinctionEntry button[onclick="removeDistinction(this)"]');
+    
+    // Empêcher la suppression si une seule entrée est présente
+    if (entries.length <= 1) {
+        removeButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        removeButtons.forEach(btn => btn.style.display = 'block');
+    }
+}
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', toggleRemoveButtons);
+</script>
+{% endblock %}
