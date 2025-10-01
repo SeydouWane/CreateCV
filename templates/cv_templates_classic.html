@@ -136,7 +136,10 @@
   <h3>{{ edu.degree }} <span style="font-weight: normal;">@ {{ edu.school }}</span></h3>
   <p class="date-range">{{ edu.start_year }} {% if edu.in_progress %}– En cours{% else %}– {{ edu.end_year }}{% endif %}</p>
   
-  {% if edu.courses | select('length') | list %}
+  {% set non_empty_courses = edu.courses | reject('equalto', '') | list %}
+  {% if non_empty_courses %}
+      <p style="font-size: 9pt; margin-top: 5px;">Matières principales : {{ non_empty_courses | join(', ') }}</p>
+  {% endif %}
   <p style="margin-top: 5px; margin-bottom: 2px; font-size: 10pt;">**Matières/Cours principaux :**</p>
   <ul style="list-style-type: circle; margin-top: 0;">
     {% for course in edu.courses %}
