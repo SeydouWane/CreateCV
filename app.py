@@ -38,8 +38,6 @@ def save_single_entry_data(fields_list):
         data[field] = request.form.get(field)
     return data
 
-# Fichier app.py, fonction save_list_data (CORRIGÉE)
-
 def save_list_data(fields_map):
     """Sauvegarde des données de listes dynamiques (expériences, formations, etc.)."""
     
@@ -51,7 +49,9 @@ def save_list_data(fields_map):
 
     # 2. Déterminer la longueur de la liste (basé sur le premier champ, le plus fiable)
     first_field = list(fields_map.keys())[0]
-    if not form_data or not form_data.get(first_field):
+    
+    # Correction: Si le premier champ n'existe pas dans les données postées (form_data.get(first_field)), on retourne vide.
+    if not form_data.get(first_field):
         return []
     
     list_length = len(form_data[first_field])
@@ -67,32 +67,34 @@ def save_list_data(fields_map):
 
     for i in range(list_length):
         # Vérification si l'entrée principale (le premier champ) n'est pas vide
+        # Ceci ignore les lignes dynamiques ajoutées et laissées vides par l'utilisateur
         if not form_data[first_field][i].strip():
             continue
             
         entry = {}
         for field, type_conversion in fields_map.items():
             
-            # 🚨 LIGNE DE SÉCURITÉ AJOUTÉE : Vérifie que la liste existe et que l'index 'i' est valide.
-            if i >= len(form_data.get(field, [])):
-                 # Si le champ manque pour cet index, on passe ou on met une valeur par défaut.
-                 # Pour les champs non-booléens, on met une chaîne vide.
-                 value = '' 
-            elif type_conversion == bool:
-                # La logique pour les booléens ne change pas car elle utilise checked_fields,
-                # mais le champ 'field' est utilisé pour construire checked_fields
-                entry[field] = str(i) in checked_fields[field]
-                continue # Passer à la prochaine itération de la boucle interne
+            # SECURITÉ AMÉLIORÉE: S'assurer que chaque champ existe pour l'index 'i'
+            if type_conversion == bool:
+                # La logique pour les booléens est basée sur l'index 'i'
+                # Note: Vous avez besoin de la correction du template step1a pour que cela fonctionne parfaitement pour les langues.
+                entry[field] = str(i) in checked_fields.get(field, [])
+                continue 
+            
+            # S'assurer que l'index existe dans la liste des champs non-booléens
+            list_of_values = form_data.get(field, [])
+            if i < len(list_of_values):
+                 value = list_of_values[i]
             else:
-                value = form_data[field][i]
-                
+                 value = '' # Défaut à vide si la liste n'est pas complète pour cet index
+            
             entry[field] = value
         
         data_list.append(entry)
         
     return data_list
 
-# --- ROUTES DES FORMULAIRES ---
+# --- ROUTES DES FORMULAIRES (AUCUN CHANGEMENT NÉCESSAIRE) ---
 
 @app.route('/')
 def index():
@@ -103,6 +105,8 @@ def index():
 def step1():
     """Infos Personnelles."""
     if request.method == 'POST':
+        # NOTE: La gestion de la photo n'est pas implémentée ici (téléchargement). 
+        # C'est une tâche séparée (voir l'audit précédent).
         session['personal_info'] = save_single_entry_data(
             ['name', 'email', 'phone', 'linkedin', 'photo_path'])
         session.modified = True
@@ -113,6 +117,8 @@ def step1():
 @app.route('/step1a', methods=['GET', 'POST'])
 def step1a():
     """Langues."""
+    # NOTE: Cette fonction repose sur la correction du template form_step1a.html 
+    # (Champs 'name', 'speak[]', 'read[]', 'write[]' avec index dans la value)
     fields = {'name': str, 'speak': bool, 'read': bool, 'write': bool}
     if request.method == 'POST':
         session['languages'] = save_list_data(fields)
@@ -141,6 +147,7 @@ def step2():
         # Traiter les cours et les ajouter à chaque entrée
         for i, entry in enumerate(education_list):
             entry['courses'] = []
+            # La logique suivante est bonne car elle dépend de l'index 'i' généré par save_list_data
             if i < len(courses1) and courses1[i].strip():
                 entry['courses'].append(courses1[i].strip())
             if i < len(courses2) and courses2[i].strip():
@@ -154,7 +161,6 @@ def step2():
         session.modified = True
         return redirect(url_for(STEP_REDIRECTS['step2']))
     
-    # 🎯 CORRECTION: Ajout du return pour la méthode GET
     return render_template('form_step2.html', education=session.get('education', []))
 
         
@@ -210,6 +216,7 @@ def step6():
 def template_select():
     """Choix du Template."""
     if request.method == 'POST':
+        # 'classic' est le défaut si rien n'est sélectionné
         session['template_choice'] = request.form.get('template_choice', 'classic')
         session.modified = True
         return redirect(url_for(STEP_REDIRECTS['template_select']))
@@ -249,21 +256,23 @@ def generate_cv():
     if HTML: # Vérifie si WeasyPrint a été importé
         try:
             # 🚨 CORRECTION CRUCIALE DU CONSTRUCTEUR PDF 🚨
-            # On utilise request.url_root comme base_url pour que WeasyPrint puisse trouver les images/CSS
+            # WeasyPrint a besoin de l'URL racine (base_url=request.url_root) 
+            # pour trouver les images et les CSS locaux (ex: static/uploads/photo.jpg)
             html_object = HTML(string=html_out, base_url=request.url_root)
             
-            # Appel de la méthode write_pdf() sans arguments supplémentaires
+            # Appel de la méthode write_pdf()
             pdf_bytes = html_object.write_pdf()
             
             pdf_file = io.BytesIO(pdf_bytes)
 
         except Exception as e:
-            app.logger.error(f"Erreur de conversion PDF : {e}")
-            # Si la conversion PDF échoue, on affiche le HTML brut pour le débogage
+            # En cas d'erreur WeasyPrint (formatage, dépendances)
+            app.logger.error(f"Erreur de conversion PDF (WeasyPrint) : {e}")
+            # Affichage du HTML brut pour faciliter le débogage par l'utilisateur
             return html_out, 200, {'Content-Type': 'text/html'}
     
     else:
-        # Si WeasyPrint n'a pas pu être importé du tout
+        # Si la librairie WeasyPrint n'a pas pu être importée au démarrage
         return html_out, 200, {'Content-Type': 'text/html'}
 
 
@@ -278,4 +287,5 @@ def generate_cv():
     )
 
 if __name__ == '__main__':
+
     app.run(host='0.0.0.0', port=5000, debug=True)
