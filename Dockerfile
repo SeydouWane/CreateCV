@@ -10,7 +10,7 @@ RUN apt-get update \
     libcairo2 \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
-    libgdk-pixbuf2.0-0 \
+    libgdk-pixbuf-xlib-2.0-0 \
     libxml2-dev \
     libxslt-dev \
     libopenjp2-7 \
@@ -28,7 +28,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier le reste du code
 COPY . .
 
-# Définir la commande de démarrage (ajuster au besoin)
-CMD ["gunicorn", "app:app"] 
-# Ou si vous utilisez Flask directement:
-# CMD ["python", "app.py"]
+# Définir la commande de démarrage
+CMD ["gunicorn", "app:app"]
