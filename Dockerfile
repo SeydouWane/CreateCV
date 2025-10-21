@@ -29,4 +29,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Définir la commande de démarrage
-CMD ["gunicorn", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
