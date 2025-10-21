@@ -138,22 +138,23 @@
   
   {% set non_empty_courses = edu.courses | reject('equalto', '') | list %}
   {% if non_empty_courses %}
-      <p style="font-size: 9pt; margin-top: 5px;">Matières principales : {{ non_empty_courses | join(', ') }}</p>
-  {% endif %}
-  <p style="margin-top: 5px; margin-bottom: 2px; font-size: 10pt;">**Matières/Cours principaux :**</p>
+  <p style="margin-top: 5px; margin-bottom: 2px; font-size: 10pt;">
+    <strong>Matières/Cours principaux :</strong>
+  </p>
   <ul style="list-style-type: circle; margin-top: 0;">
-    {% for course in edu.courses %}
-      {% if course %}<li>{{ course }}</li>{% endif %}
+    {% for course in non_empty_courses %}
+      <li>{{ course }}</li>
     {% endfor %}
   </ul>
   {% endif %}
   
   {% if edu.thesis_subject %}
-  <p style="margin: 5px 0 0 0; font-size: 10pt;">**Mémoire/Thèse :** {{ edu.thesis_subject }}</p>
+  <p style="margin: 5px 0 0 0; font-size: 10pt;">
+    <strong>Mémoire/Thèse :</strong> {{ edu.thesis_subject }}
+  </p>
   <p class="subtle">Encadrant(s) : {{ edu.thesis_supervisors }}</p>
   {% endif %}
-{% endfor %}
-{% endif %}
+{% endfor %} {% endif %}
 
 ---
 {% if data.skills or data.languages %}
