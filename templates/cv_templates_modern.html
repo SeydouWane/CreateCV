@@ -36,7 +36,8 @@
       width: 33%; /* 1/3 de la page */
       background-color: var(--accent-bg);
       padding: 30px 20px 30px 30px;
-      height: 100%; /* S'assurer qu'elle s'étend sur toute la hauteur */
+      /* Utiliser 'min-height' au lieu de 'height: 100%' pour une meilleure compatibilité PDF */
+      min-height: 1000px; 
       border-right: 2px solid var(--accent-color);
     }
     .right-column {
@@ -191,8 +192,6 @@
             {% set non_empty_courses = edu.courses | reject('equalto', '') | list %}
             {% if non_empty_courses %}
                 <p style="font-size: 9pt; margin-top: 5px;">Matières principales : {{ non_empty_courses | join(', ') }}</p>
-            {% endif %}
-            <p style="font-size: 9pt; margin-top: 5px;">Matières principales : {{ edu.courses | join(', ') }}</p>
             {% endif %}
             
             {% if edu.thesis_subject %}
