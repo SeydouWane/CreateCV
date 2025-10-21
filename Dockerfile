@@ -1,8 +1,7 @@
-# Utiliser une image Python de base
-FROM python:3.11-slim
+# Utiliser une image Python de base plus complète (Bullseye)
+FROM python:3.11-bullseye
 
 # Mettre à jour apt et installer les dépendances nécessaires pour WeasyPrint
-# Note: Ces sont les paquets standard pour Pango, Cairo, etc. sur Debian/Ubuntu.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
