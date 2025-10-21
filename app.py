@@ -6,7 +6,8 @@ import io
 # --- 🚨 DÉPENDANCE WEASYPRINT ---
 # Assurez-vous d'avoir installé 'weasyprint' (et ses dépendances GTK si sur macOS/Linux).
 try:
-    from weasyprint import HTML
+    # 🚨 CORRECTION FINALE : Importer UNIQUEMENT HTML pour éviter le conflit "PDF"
+    from weasyprint import HTML 
 except ImportError:
     # Cette fonction de substitution est utilisée si WeasyPrint n'est pas trouvé
     print("ATTENTION: La librairie 'weasyprint' n'est pas installée. Le CV sera renvoyé en HTML brut (mode débogage).")
@@ -67,7 +68,6 @@ def save_list_data(fields_map):
 
     for i in range(list_length):
         # Vérification si l'entrée principale (le premier champ) n'est pas vide
-        # Ceci ignore les lignes dynamiques ajoutées et laissées vides par l'utilisateur
         if not form_data[first_field][i].strip():
             continue
             
@@ -77,7 +77,6 @@ def save_list_data(fields_map):
             # SECURITÉ AMÉLIORÉE: S'assurer que chaque champ existe pour l'index 'i'
             if type_conversion == bool:
                 # La logique pour les booléens est basée sur l'index 'i'
-                # Note: Vous avez besoin de la correction du template step1a pour que cela fonctionne parfaitement pour les langues.
                 entry[field] = str(i) in checked_fields.get(field, [])
                 continue 
             
@@ -105,8 +104,6 @@ def index():
 def step1():
     """Infos Personnelles."""
     if request.method == 'POST':
-        # NOTE: La gestion de la photo n'est pas implémentée ici (téléchargement). 
-        # C'est une tâche séparée (voir l'audit précédent).
         session['personal_info'] = save_single_entry_data(
             ['name', 'email', 'phone', 'linkedin', 'photo_path'])
         session.modified = True
@@ -117,8 +114,6 @@ def step1():
 @app.route('/step1a', methods=['GET', 'POST'])
 def step1a():
     """Langues."""
-    # NOTE: Cette fonction repose sur la correction du template form_step1a.html 
-    # (Champs 'name', 'speak[]', 'read[]', 'write[]' avec index dans la value)
     fields = {'name': str, 'speak': bool, 'read': bool, 'write': bool}
     if request.method == 'POST':
         session['languages'] = save_list_data(fields)
@@ -147,7 +142,6 @@ def step2():
         # Traiter les cours et les ajouter à chaque entrée
         for i, entry in enumerate(education_list):
             entry['courses'] = []
-            # La logique suivante est bonne car elle dépend de l'index 'i' généré par save_list_data
             if i < len(courses1) and courses1[i].strip():
                 entry['courses'].append(courses1[i].strip())
             if i < len(courses2) and courses2[i].strip():
@@ -216,7 +210,6 @@ def step6():
 def template_select():
     """Choix du Template."""
     if request.method == 'POST':
-        # 'classic' est le défaut si rien n'est sélectionné
         session['template_choice'] = request.form.get('template_choice', 'classic')
         session.modified = True
         return redirect(url_for(STEP_REDIRECTS['template_select']))
@@ -257,7 +250,6 @@ def generate_cv():
         try:
             # 🚨 CORRECTION CRUCIALE DU CONSTRUCTEUR PDF 🚨
             # WeasyPrint a besoin de l'URL racine (base_url=request.url_root) 
-            # pour trouver les images et les CSS locaux (ex: static/uploads/photo.jpg)
             html_object = HTML(string=html_out, base_url=request.url_root)
             
             # Appel de la méthode write_pdf()
@@ -266,9 +258,9 @@ def generate_cv():
             pdf_file = io.BytesIO(pdf_bytes)
 
         except Exception as e:
-            # En cas d'erreur WeasyPrint (formatage, dépendances)
+            # En cas d'erreur WeasyPrint (le problème "PDF.__init__")
             app.logger.error(f"Erreur de conversion PDF (WeasyPrint) : {e}")
-            # Affichage du HTML brut pour faciliter le débogage par l'utilisateur
+            # Affichage du HTML brut (mode débogage)
             return html_out, 200, {'Content-Type': 'text/html'}
     
     else:
